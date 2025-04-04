@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 7%;
+    --foreground: 0 0% 95%;
+    
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 95%;
+    
+    --popover: 0 0% 12%;
+    --popover-foreground: 0 0% 95%;
+    
+    --primary: 272 100% 56%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 326 100% 50%;
+    --secondary-foreground: 0 0% 100%;
+    
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 63.9%;
+    
+    --accent: 326 100% 50%;
+    --accent-foreground: 0 0% 100%;
+    
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.9%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .gradient-text {
+    @apply bg-gradient-to-r from-accent-purple to-accent-magenta text-transparent bg-clip-text;
+  }
+
+  .gradient-bg {
+    @apply bg-gradient-to-br from-[rgba(183,33,255,0.05)] to-[rgba(255,0,200,0.05)];
+  }
+
+  .btn-hover-effect {
+    @apply relative overflow-hidden transition-all duration-300;
+  }
+
+  .btn-hover-effect::after {
+    content: '';
+    @apply absolute h-full w-full top-0 -left-full bg-gradient-to-r from-white/10 to-transparent transition-all duration-300;
+  }
+
+  .btn-hover-effect:hover::after {
+    @apply left-full;
+  }
+
+  .nav-link {
+    @apply relative;
+  }
+
+  .nav-link::after {
+    content: '';
+    @apply absolute w-0 h-0.5 bottom-0 left-0 bg-gradient-to-r from-accent-purple to-accent-magenta transition-all duration-300;
+  }
+
+  .nav-link:hover::after {
+    @apply w-full;
+  }
+}
+
+@layer utilities {
+  .bg-dark {
+    @apply bg-[#121212];
+  }
+
+  .bg-dark-800 {
+    @apply bg-[#1E1E1E];
+  }
+
+  .bg-dark-700 {
+    @apply bg-[#2D2D2D];
+  }
+
+  .bg-dark-600 {
+    @apply bg-[#333333];
+  }
+
+  .text-silver {
+    @apply text-[#E0E0E0];
+  }
+
+  .text-silver-light {
+    @apply text-[#F5F5F5];
+  }
+
+  .text-silver-dark {
+    @apply text-[#A0A0A0];
+  }
+
+  .accent-purple {
+    @apply text-[#B721FF];
+  }
+
+  .accent-magenta {
+    @apply text-[#FF00C8];
+  }
+
+  .accent-blue {
+    @apply text-[#00D9FF];
+  }
+
+  .accent-yellow {
+    @apply text-[#FFD600];
+  }
+
+  .from-accent-purple {
+    @apply from-[#B721FF];
+  }
+
+  .to-accent-magenta {
+    @apply to-[#FF00C8];
+  }
+}
