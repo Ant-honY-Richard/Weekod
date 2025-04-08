@@ -64,8 +64,11 @@ const Header = ({ toggleMobileMenu }: HeaderProps) => {
                   <span className="cursor-pointer font-medium">Services</span>
                   {activeSection === 'services' && (
                     <motion.div 
-                      className="h-1 w-full absolute bottom-0 bg-gradient-to-r from-accent-purple to-accent-magenta rounded-full" 
+                      className="h-1 w-full absolute bottom-0 bg-gradient-to-r from-accent-purple to-accent-magenta rounded-full shadow-glow"
                       layoutId="activeNavIndicator"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.3 }}
                     />
                   )}
                 </div>
@@ -78,8 +81,11 @@ const Header = ({ toggleMobileMenu }: HeaderProps) => {
                   <span className="cursor-pointer font-medium">Process</span>
                   {activeSection === 'process' && (
                     <motion.div 
-                      className="h-1 w-full absolute bottom-0 bg-gradient-to-r from-accent-purple to-accent-magenta rounded-full" 
+                      className="h-1 w-full absolute bottom-0 bg-gradient-to-r from-accent-purple to-accent-magenta rounded-full shadow-glow"
                       layoutId="activeNavIndicator"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.3 }}
                     />
                   )}
                 </div>
@@ -92,8 +98,11 @@ const Header = ({ toggleMobileMenu }: HeaderProps) => {
                   <span className="cursor-pointer font-medium">Portfolio</span>
                   {activeSection === 'portfolio' && (
                     <motion.div 
-                      className="h-1 w-full absolute bottom-0 bg-gradient-to-r from-accent-purple to-accent-magenta rounded-full" 
+                      className="h-1 w-full absolute bottom-0 bg-gradient-to-r from-accent-purple to-accent-magenta rounded-full shadow-glow"
                       layoutId="activeNavIndicator"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.3 }}
                     />
                   )}
                 </div>
@@ -106,8 +115,11 @@ const Header = ({ toggleMobileMenu }: HeaderProps) => {
                   <span className="cursor-pointer font-medium">Testimonials</span>
                   {activeSection === 'testimonials' && (
                     <motion.div 
-                      className="h-1 w-full absolute bottom-0 bg-gradient-to-r from-accent-purple to-accent-magenta rounded-full" 
+                      className="h-1 w-full absolute bottom-0 bg-gradient-to-r from-accent-purple to-accent-magenta rounded-full shadow-glow"
                       layoutId="activeNavIndicator"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.3 }}
                     />
                   )}
                 </div>
@@ -120,8 +132,11 @@ const Header = ({ toggleMobileMenu }: HeaderProps) => {
                   <span className="cursor-pointer font-medium">Team</span>
                   {activeSection === 'team' && (
                     <motion.div 
-                      className="h-1 w-full absolute bottom-0 bg-gradient-to-r from-accent-purple to-accent-magenta rounded-full" 
+                      className="h-1 w-full absolute bottom-0 bg-gradient-to-r from-accent-purple to-accent-magenta rounded-full shadow-glow"
                       layoutId="activeNavIndicator"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.3 }}
                     />
                   )}
                 </div>
@@ -134,11 +149,20 @@ const Header = ({ toggleMobileMenu }: HeaderProps) => {
         <div className="flex items-center space-x-4">
           <Link href="#contact">
             <motion.div 
-              className="btn-hover-effect cursor-pointer bg-gradient-to-r from-accent-purple to-accent-magenta px-6 py-2.5 rounded-full text-white font-medium transition-all hover:shadow-lg hover:shadow-accent-purple/20"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.98 }}
+              className="btn-hover-effect cursor-pointer bg-gradient-to-r from-accent-purple to-accent-magenta px-6 py-2.5 rounded-full text-white font-medium shadow-md"
+              initial={{ boxShadow: "0 4px 10px rgba(183, 33, 255, 0.2)" }}
+              whileHover={{ 
+                scale: 1.03,
+                textShadow: "0 0 8px rgba(255,255,255,0.8)" 
+              }}
+              whileTap={{ scale: 0.97 }}
+              transition={{
+                type: "spring",
+                stiffness: 400,
+                damping: 10
+              }}
             >
-              Get in Touch
+              <span className="relative z-10">Get in Touch</span>
             </motion.div>
           </Link>
           

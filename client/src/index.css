@@ -53,15 +53,40 @@
 
   .btn-hover-effect {
     @apply relative overflow-hidden transition-all duration-300;
+    background-size: 200% auto;
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .btn-hover-effect::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-accent-purple to-accent-magenta opacity-0 transition-all duration-300 rounded-full -z-10;
+    filter: blur(15px);
+    transform: scale(0.9);
   }
 
   .btn-hover-effect::after {
     content: '';
-    @apply absolute h-full w-full top-0 -left-full bg-gradient-to-r from-white/10 to-transparent transition-all duration-300;
+    @apply absolute h-full w-full top-0 -left-full bg-gradient-to-r from-white/20 to-transparent transition-all duration-300;
+  }
+
+  .btn-hover-effect:hover {
+    background-position: right center;
+    box-shadow: 0 5px 15px rgba(183, 33, 255, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .btn-hover-effect:hover::before {
+    @apply opacity-100;
+    transform: scale(1.1);
   }
 
   .btn-hover-effect:hover::after {
     @apply left-full;
+  }
+
+  .btn-hover-effect:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 8px rgba(183, 33, 255, 0.3);
   }
 
   .nav-link {
@@ -75,6 +100,46 @@
 
   .nav-link:hover::after {
     @apply w-full;
+  }
+}
+
+/* Keyframe Animations */
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 8px 1px rgba(183, 33, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 16px 4px rgba(183, 33, 255, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 8px 1px rgba(183, 33, 255, 0.3);
+  }
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+  30%, 50%, 70% {
+    transform: translate3d(-3px, 0, 0);
+  }
+  40%, 60% {
+    transform: translate3d(3px, 0, 0);
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
   }
 }
 
@@ -129,5 +194,28 @@
 
   .to-accent-magenta {
     @apply to-[#FF00C8];
+  }
+  
+  .shadow-glow {
+    box-shadow: 0 0 12px 2px rgba(183, 33, 255, 0.4);
+    animation: pulse-glow 2s infinite ease-in-out;
+  }
+  
+  .shake-element {
+    animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+  
+  .shake-hover:hover {
+    animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+  
+  .floating {
+    animation: float 6s ease-in-out infinite;
   }
 }
