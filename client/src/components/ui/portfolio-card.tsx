@@ -165,28 +165,29 @@ const PortfolioCard = ({ title, subtitle, description, tags, category, link }: P
         <p className="text-silver mb-4">{description}</p>
         
         {/* CTA */}
-        <motion.a 
-          href={link} 
-          className="inline-flex items-center text-accent-magenta hover:text-accent-purple transition-colors"
-          whileHover={{ x: 5 }}
-          transition={{ type: "spring", stiffness: 400, damping: 10 }}
-        >
-          View Project 
-          <motion.svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            className="h-5 w-5 ml-2" 
-            viewBox="0 0 20 20" 
-            fill="currentColor"
-            animate={{ x: isHovered ? [0, 5, 0] : 0 }}
-            transition={{ 
-              duration: 1, 
-              repeat: isHovered ? Infinity : 0, 
-              ease: "easeInOut" 
-            }}
+        <a href={link} className="no-underline">
+          <motion.div 
+            className="inline-flex items-center text-accent-magenta hover:text-accent-purple transition-colors cursor-pointer"
+            whileHover={{ x: 5 }}
+            transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
-            <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-          </motion.svg>
-        </motion.a>
+            View Project 
+            <motion.svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="h-5 w-5 ml-2" 
+              viewBox="0 0 20 20" 
+              fill="currentColor"
+              animate={{ x: isHovered ? [0, 5, 0] : 0 }}
+              transition={{ 
+                duration: 1, 
+                repeat: isHovered ? Infinity : 0, 
+                ease: "easeInOut" 
+              }}
+            >
+              <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+            </motion.svg>
+          </motion.div>
+        </a>
       </div>
     </motion.div>
   );

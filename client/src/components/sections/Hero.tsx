@@ -84,14 +84,22 @@ const Hero = () => {
               variants={itemVariants}
             >
               <Link href="#contact">
-                <a className="btn-hover-effect bg-gradient-to-r from-accent-purple to-accent-magenta px-8 py-4 rounded-full text-white font-semibold text-center transition-all hover:shadow-lg hover:shadow-accent-purple/20">
+                <motion.div 
+                  className="btn-hover-effect bg-gradient-to-r from-accent-purple to-accent-magenta px-8 py-4 rounded-full text-white font-semibold text-center transition-all hover:shadow-lg hover:shadow-accent-purple/20"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
                   Get a Free Consultation
-                </a>
+                </motion.div>
               </Link>
               <Link href="#portfolio">
-                <a className="btn-hover-effect px-8 py-4 rounded-full text-silver border border-silver hover:text-white hover:border-white text-center transition-colors">
+                <motion.div 
+                  className="btn-hover-effect px-8 py-4 rounded-full text-silver border border-silver hover:text-white hover:border-white text-center transition-colors"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
                   View Our Work
-                </a>
+                </motion.div>
               </Link>
             </motion.div>
             

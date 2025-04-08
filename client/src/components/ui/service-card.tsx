@@ -66,8 +66,8 @@ const ServiceCard = ({ icon, title, description, link }: ServiceCardProps) => {
       {/* CTA Link */}
       <div className="relative z-10">
         <Link href={link}>
-          <motion.a 
-            className="inline-flex items-center text-accent-magenta hover:text-accent-purple transition-colors"
+          <motion.div 
+            className="inline-flex items-center text-accent-magenta hover:text-accent-purple transition-colors cursor-pointer"
             whileHover={{ x: 5 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
@@ -88,7 +88,7 @@ const ServiceCard = ({ icon, title, description, link }: ServiceCardProps) => {
             >
               <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
             </motion.svg>
-          </motion.a>
+          </motion.div>
         </Link>
       </div>
       
