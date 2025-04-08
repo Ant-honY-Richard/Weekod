@@ -1,0 +1,56 @@
+🔧 Technical & Functional Fixes
+1. ✅ Fix Mobile Overlap in “Get in Touch” Section
+Issue: The form or content is overlapping with the logo on smaller screens.
+
+Prompt:
+
+Adjust mobile layout using media queries to ensure the “Get in Touch” section does not overlap with the logo. Use flex-col or grid layout on small screens and provide padding/margin to separate elements.
+
+2. ✅ Fix Overlap of “Start Your Project” and “Schedule a Call” Buttons
+Issue: The buttons are stacked or overlapping on mobile view.
+
+Prompt:
+
+Stack the “Start Your Project” and “Schedule a Call” buttons vertically on mobile screens. Add margin between buttons and wrap them in a flex-col container for better spacing.
+
+3. ✅ Navigation Bar Not Working on Click
+Issue: Nav links are not scrolling or routing on click.
+
+Prompt:
+
+Ensure that navigation links are properly linked with correct href="#section-id" and that corresponding section IDs exist. Also, add smooth scroll behavior via CSS (scroll-behavior: smooth;) or JavaScript.
+
+4. ✅ Budget Section Improvements
+Issue: Possibly unclear or not intuitive.
+
+Prompt:
+
+Redesign the budget section to include a budget slider or multiple budget tier cards (e.g., Starter, Growth, Enterprise). Add descriptive text and icons to make it more user-friendly and visually engaging.
+
+5. ✅ Add Relevant Images or Illustrations
+Issue: Sections are text-heavy and need visuals.
+
+Prompt:
+
+Add custom illustrations, icons, or mockups related to web development, client onboarding, or digital presence. Use Undraw, Pexels, or custom illustrations for a professional look.
+
+🎨 Design Enhancements
+6. ✅ Typography & Fonts
+Prompt:
+
+Use a consistent modern font like Poppins, Inter, or DM Sans. Increase font size for headings on mobile for better readability.
+
+7. ✅ Color Palette
+Prompt:
+
+Use a brand-consistent palette with primary, secondary, and accent colors. Avoid using too many grays or dull tones—bring contrast.
+
+8. ✅ Image Responsiveness
+Prompt:
+
+Ensure all images are responsive using object-fit, width: 100%, and proper aspect ratio classes to avoid stretching on mobile.
+
+9. ✅ Section Spacing
+Prompt:
+
+Apply consistent vertical spacing (pt-16, pb-16, etc.) between sections. On mobile, increase padding/margin to avoid a crammed look.
