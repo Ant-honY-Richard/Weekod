@@ -40,24 +40,28 @@ const CallToAction = () => {
               </p>
               
               <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <Link href="#contact">
-                  <motion.a 
-                    className="btn-hover-effect bg-gradient-to-r from-accent-purple to-accent-magenta px-8 py-4 rounded-full text-white font-semibold text-center transition-all hover:shadow-lg hover:shadow-accent-purple/20"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <a 
+                    href="#contact"
+                    className="btn-hover-effect inline-block w-full bg-gradient-to-r from-accent-purple to-accent-magenta px-8 py-4 rounded-full text-white font-semibold text-center transition-all hover:shadow-lg hover:shadow-accent-purple/20"
                   >
                     Start Your Project
-                  </motion.a>
-                </Link>
-                <Link href="#">
-                  <motion.a 
-                    className="btn-hover-effect px-8 py-4 rounded-full text-silver border border-silver hover:text-white hover:border-white text-center transition-colors"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                  </a>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <a 
+                    href="#" 
+                    className="btn-hover-effect inline-block w-full px-8 py-4 rounded-full text-silver border border-silver hover:text-white hover:border-white text-center transition-colors"
                   >
                     Schedule a Call
-                  </motion.a>
-                </Link>
+                  </a>
+                </motion.div>
               </div>
             </motion.div>
           </div>

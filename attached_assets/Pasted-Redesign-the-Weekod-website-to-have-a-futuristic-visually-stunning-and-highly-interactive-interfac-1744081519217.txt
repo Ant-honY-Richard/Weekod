@@ -1,0 +1,81 @@
+Redesign the Weekod website to have a futuristic, visually stunning, and highly interactive interface while maintaining clarity and performance.
+
+🧠 Design Style:
+Futuristic, sleek, and minimal
+
+Glassmorphism and Neumorphism elements
+
+Smooth, immersive transitions (use Framer Motion or GSAP)
+
+Layered effects, shadows, and gradients with subtle 3D depth
+
+High-tech typefaces (e.g., Orbitron, Exo, Eurostile, or modern sans-serif like Inter)
+
+💻 Homepage Design Breakdown:
+1. Hero Section
+Dark or gradient background with particles or dynamic shapes (Three.js or Lottie animation)
+
+Large bold headline with a neon or soft-glow effect
+
+Animated “Start Your Project” + “Schedule a Call” buttons with hover glow
+
+Floating or 3D logo animation (subtle pulsing/glow)
+
+Add relevant background motion: like Zoma
+
+2. Services/Features Section
+Use futuristic icons (animated SVGs)
+
+Split-card layout with hover flips or subtle zoom effects
+
+Use glass-like translucent card design with a neon glow border
+
+Animate each card on scroll with fade-slide effect
+
+3. “Start Your Project” CTA
+Place inside a dynamic curved section
+
+Add a glowing arrow or chevron animating toward the button
+
+On hover: button should “charge up” (animated borders or particle effect)
+
+4. Budget Section
+Create an interactive budget slider (custom-styled, not default)
+
+Budget ranges should show immediate change with preview animation or UI hints
+
+Use futuristic toggles and tier cards (Starter, Growth, Enterprise)
+
+5. Get in Touch Section
+Fix responsiveness issues — space the form correctly on mobile
+
+Add floating labels inside inputs
+
+Background: low-opacity tech patterns, lines, or holographic textures
+
+6. Footer
+Use a dark transparent background with neon-lit section dividers
+
+Animated social icons with glowing border pulses
+
+Include a back-to-top button with scroll animation
+
+📱 Mobile-First Enhancements:
+Stack buttons & forms with gap spacing and padding
+
+Add collapsible navbar with hamburger menu (slide-in)
+
+Mobile version must maintain futuristic feel with large tap targets and smooth transitions
+
+🖼️ Assets & Visuals Suggestions:
+Use futuristic illustrations from Storyset, LottieFiles, or 3D assets from Spline
+
+Compress all images for web performance
+
+💡 Bonus Enhancements:
+Add a “Live Chat” floating icon with typing animation
+
+Use scroll-triggered animations for content load
+
+Include subtle background audio (muted by default) or ambient hum
+
