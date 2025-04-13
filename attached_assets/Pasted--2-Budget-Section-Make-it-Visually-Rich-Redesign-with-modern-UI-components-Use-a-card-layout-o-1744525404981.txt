@@ -1,0 +1,127 @@
+✅ 2. Budget Section – Make it Visually Rich
+Redesign with modern UI components:
+
+Use a card layout or stepper-based budget selector
+
+Include tooltips or hover explanations for each service tier
+
+Optionally, add an animated pricing calculator
+
+Integrate currency as ₹ (INR) using:
+
+js
+Copy
+Edit
+Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' })
+Example Budget Tiers:
+json
+Copy
+Edit
+[
+  { label: "Landing Page", price: "₹5,000 – ₹8,000" },
+  { label: "Business Website", price: "₹12,000 – ₹25,000" },
+  { label: "Full-Stack App", price: "₹50,000 – ₹1,50,000+" }
+]
+✅ 3. Navbar Links Not Working
+Add proper href IDs in navbar:
+
+html
+Copy
+Edit
+<a href="#services">Services</a>
+<a href="#technology">Technology</a>
+<a href="#budget">Budget</a>
+<a href="#contact">Get In Touch</a>
+Add corresponding id to sections:
+
+html
+Copy
+Edit
+<section id="budget">...</section>
+Enable smooth scrolling:
+
+css
+Copy
+Edit
+html { scroll-behavior: smooth; }
+✅ 4. Fix Get in Touch Overlap
+In mobile view:
+
+Reduce padding/margin of logo container
+
+Scale down Get In Touch form slightly
+
+Adjust flexbox/grid layout to prevent overlapping with "WEEKOD" name
+
+Add media queries to tune spacing
+
+✅ 5. Email Integration: Send Form to Email
+When customer clicks Send Message:
+
+Submit form data to backend
+
+Use Node.js + Nodemailer to send a copy to: 📧 alienstudiox@gmail.com
+
+Email Template (Dynamic):
+yaml
+Copy
+Edit
+Subject: [New Client Message from Weekod]
+
+Name: {{name}}
+Email: {{email}}
+Phone: {{phone}}
+Selected Service: {{service}}
+Estimated Budget: {{budget}}
+
+Message:
+{{message}}
+
+— Sent via Weekod Website
+Backend Email Handler (Node.js + Nodemailer):
+js
+Copy
+Edit
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'yourGmail@gmail.com',
+    pass: 'yourAppPassword'
+  }
+});
+
+app.post('/api/send-message', async (req, res) => {
+  const { name, email, phone, message, service, budget } = req.body;
+
+  const mailOptions = {
+    from: 'yourGmail@gmail.com',
+    to: 'alienstudiox@gmail.com',
+    subject: `New Message from ${name} (Weekod Website)`,
+    html: `
+      <h2>Client Contact</h2>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Phone:</strong> ${phone}</p>
+      <p><strong>Service:</strong> ${service}</p>
+      <p><strong>Budget:</strong> ${budget}</p>
+      <p><strong>Message:</strong><br/>${message}</p>
+    `
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Email failed to send.' });
+  }
+});
+✅ Optional Upgrades
+Add form validation (required fields, valid email, etc.)
+
+Show a toast notification or modal on successful form submission
+
+Add a spinner/loader while sending
+
+Enable offline storage fallback using IndexedDB if needed

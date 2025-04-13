@@ -176,8 +176,8 @@ const Contact = () => {
                       type="range" 
                       id="budget_slider" 
                       name="budget_slider"
-                      min="3000" 
-                      max="250000" 
+                      min="5000" 
+                      max="150000" 
                       step="5000"
                       className="w-full h-2 appearance-none rounded-full bg-dark-600 cursor-pointer accent-accent-purple"
                       defaultValue="15000"
@@ -185,13 +185,10 @@ const Contact = () => {
                         const value = parseInt(e.target.value);
                         let budgetRange = '';
                         
-                        if (value <= 7000) budgetRange = '3000-7000';
-                        else if (value <= 15000) budgetRange = '8000-15000';
-                        else if (value <= 30000) budgetRange = '15000-30000';
-                        else if (value <= 50000) budgetRange = '25000-50000';
-                        else if (value <= 100000) budgetRange = '40000-100000';
-                        else if (value <= 150000) budgetRange = '60000-150000';
-                        else budgetRange = '80000-250000';
+                        if (value <= 8000) budgetRange = '5000-8000';
+                        else if (value <= 25000) budgetRange = '12000-25000';
+                        else if (value <= 150000) budgetRange = '50000-150000';
+                        else budgetRange = '150000+';
                         
                         setFormData({
                           ...formData,
@@ -200,37 +197,61 @@ const Contact = () => {
                       }}
                     />
                     <div className="absolute top-6 left-0 right-0 flex justify-between text-xs text-silver-dark">
-                      <span>₹3,000</span>
-                      <span>₹100,000</span>
-                      <span>₹250,000+</span>
+                      <span>₹5,000</span>
+                      <span>₹50,000</span>
+                      <span>₹150,000+</span>
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-12">
+                  <div id="budget" className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-12">
                     {[
-                      '3000-7000', 
-                      '8000-15000', 
-                      '15000-30000', 
-                      '25000-50000'
-                    ].map((range, index) => (
+                      {label: "Landing Page", price: "5000-8000", description: "Single page with essential info"},
+                      {label: "Business Website", price: "12000-25000", description: "Multi-page professional site"},
+                      {label: "Full-Stack App", price: "50000-150000", description: "Complex web application"}
+                    ].map((tier, index) => (
                       <div className="flex items-center" key={index}>
                         <input 
                           type="radio" 
                           id={`budget${index + 1}`} 
                           name="budget" 
-                          value={range}
+                          value={tier.price}
                           onChange={handleInputChange}
-                          checked={formData.budget === range}
+                          checked={formData.budget === tier.price}
                           className="hidden peer" 
                         />
                         <label 
                           htmlFor={`budget${index + 1}`} 
-                          className="w-full text-center px-3 py-3 bg-dark-700 border border-dark-600 rounded-lg peer-checked:bg-accent-purple peer-checked:text-white cursor-pointer transition-all hover:border-accent-purple/50 flex flex-col items-center justify-center glass-effect-light"
+                          className="w-full text-center px-4 py-4 bg-dark-700 border border-dark-600 rounded-lg peer-checked:bg-accent-purple peer-checked:text-white cursor-pointer transition-all hover:border-accent-purple/50 flex flex-col items-center justify-center glass-effect-light relative group"
                         >
-                          <span className="font-medium">₹{range.replace('-', '-₹')}</span>
-                          <span className="text-xs mt-1 text-silver-dark opacity-80">
-                            {index === 0 ? 'Landing Page' : index === 1 ? 'Portfolio Site' : index === 2 ? 'Business Site' : 'E-commerce'}
+                          <span className="font-medium text-lg">{tier.label}</span>
+                          <span className="font-medium text-accent-magenta peer-checked:text-white mt-1">₹{tier.price.replace('-', '-₹')}</span>
+                          <span className="text-xs mt-2 text-silver-dark opacity-80 px-2">
+                            {tier.description}
                           </span>
+                          {/* Tooltip on hover */}
+                          <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-dark-800 p-3 rounded-lg shadow-xl invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-300 w-48 z-20 text-xs text-silver">
+                            <p className="font-medium mb-1">{tier.label} Includes:</p>
+                            <ul className="list-disc pl-4 text-left">
+                              {index === 0 ? 
+                                <>
+                                  <li>Responsive design</li>
+                                  <li>Contact form</li>
+                                  <li>Basic SEO</li>
+                                </> : 
+                                index === 1 ? 
+                                <>
+                                  <li>Up to 7 pages</li>
+                                  <li>CMS integration</li>
+                                  <li>Advanced SEO</li>
+                                </> :
+                                <>
+                                  <li>Custom functionality</li>
+                                  <li>User accounts</li>
+                                  <li>Payment processing</li>
+                                </>
+                              }
+                            </ul>
+                          </div>
                         </label>
                       </div>
                     ))}

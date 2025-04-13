@@ -21,7 +21,7 @@ const Header = ({ toggleMobileMenu }: HeaderProps) => {
       }
       
       // Check which section is currently visible
-      const sections = ['services', 'process', 'portfolio', 'testimonials', 'team', 'contact'];
+      const sections = ['services', 'technology', 'process', 'portfolio', 'testimonials', 'team', 'contact', 'budget'];
       for (const section of sections) {
         const element = document.getElementById(section);
         if (element) {
@@ -63,6 +63,23 @@ const Header = ({ toggleMobileMenu }: HeaderProps) => {
                   <div className="nav-item-background absolute inset-0 bg-dark-700/0 rounded-full -z-10 group-hover:bg-dark-700/30 transition-all duration-300"></div>
                   <span className="cursor-pointer font-medium">Services</span>
                   {activeSection === 'services' && (
+                    <motion.div 
+                      className="h-1 w-full absolute bottom-0 bg-gradient-to-r from-accent-purple to-accent-magenta rounded-full shadow-glow"
+                      layoutId="activeNavIndicator"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  )}
+                </div>
+              </Link>
+            </li>
+            <li>
+              <Link href="#technology">
+                <div className={`px-5 py-2.5 relative group ${activeSection === 'technology' ? 'text-white' : 'text-silver'}`}>
+                  <div className="nav-item-background absolute inset-0 bg-dark-700/0 rounded-full -z-10 group-hover:bg-dark-700/30 transition-all duration-300"></div>
+                  <span className="cursor-pointer font-medium">Technology</span>
+                  {activeSection === 'technology' && (
                     <motion.div 
                       className="h-1 w-full absolute bottom-0 bg-gradient-to-r from-accent-purple to-accent-magenta rounded-full shadow-glow"
                       layoutId="activeNavIndicator"

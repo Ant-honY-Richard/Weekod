@@ -142,6 +142,16 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
                     </Link>
                   </motion.li>
                   <motion.li variants={itemVariants}>
+                    <Link href="#technology">
+                      <div 
+                        className="block py-3 text-lg font-medium text-silver hover:text-white transition-colors cursor-pointer"
+                        onClick={handleLinkClick}
+                      >
+                        Technology
+                      </div>
+                    </Link>
+                  </motion.li>
+                  <motion.li variants={itemVariants}>
                     <Link href="#process">
                       <div 
                         className="block py-3 text-lg font-medium text-silver hover:text-white transition-colors cursor-pointer"
