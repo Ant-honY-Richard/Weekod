@@ -86,7 +86,7 @@ const Contact = () => {
           </p>
         </motion.div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10 lg:gap-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10 lg:gap-16 max-w-screen-2xl mx-auto">
           {/* Contact Form */}
           <motion.div 
             className="bg-dark-800 rounded-xl p-6 md:p-8 lg:p-10 shadow-lg"
@@ -176,19 +176,22 @@ const Contact = () => {
                       type="range" 
                       id="budget_slider" 
                       name="budget_slider"
-                      min="1000" 
-                      max="50000" 
-                      step="1000"
+                      min="3000" 
+                      max="250000" 
+                      step="5000"
                       className="w-full h-2 appearance-none rounded-full bg-dark-600 cursor-pointer accent-accent-purple"
-                      defaultValue="5000"
+                      defaultValue="15000"
                       onChange={(e) => {
                         const value = parseInt(e.target.value);
                         let budgetRange = '';
                         
-                        if (value <= 5000) budgetRange = '1000-5000';
-                        else if (value <= 10000) budgetRange = '5000-10000';
-                        else if (value <= 20000) budgetRange = '10000-20000';
-                        else budgetRange = '20000+';
+                        if (value <= 7000) budgetRange = '3000-7000';
+                        else if (value <= 15000) budgetRange = '8000-15000';
+                        else if (value <= 30000) budgetRange = '15000-30000';
+                        else if (value <= 50000) budgetRange = '25000-50000';
+                        else if (value <= 100000) budgetRange = '40000-100000';
+                        else if (value <= 150000) budgetRange = '60000-150000';
+                        else budgetRange = '80000-250000';
                         
                         setFormData({
                           ...formData,
@@ -197,14 +200,19 @@ const Contact = () => {
                       }}
                     />
                     <div className="absolute top-6 left-0 right-0 flex justify-between text-xs text-silver-dark">
-                      <span>$1,000</span>
-                      <span>$25,000</span>
-                      <span>$50,000+</span>
+                      <span>₹3,000</span>
+                      <span>₹100,000</span>
+                      <span>₹250,000+</span>
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-12">
-                    {['1000-5000', '5000-10000', '10000-20000', '20000+'].map((range, index) => (
+                    {[
+                      '3000-7000', 
+                      '8000-15000', 
+                      '15000-30000', 
+                      '25000-50000'
+                    ].map((range, index) => (
                       <div className="flex items-center" key={index}>
                         <input 
                           type="radio" 
@@ -217,11 +225,11 @@ const Contact = () => {
                         />
                         <label 
                           htmlFor={`budget${index + 1}`} 
-                          className="w-full text-center px-3 py-3 bg-dark-700 border border-dark-600 rounded-lg peer-checked:bg-accent-purple peer-checked:text-white cursor-pointer transition-all hover:border-accent-purple/50 flex flex-col items-center justify-center"
+                          className="w-full text-center px-3 py-3 bg-dark-700 border border-dark-600 rounded-lg peer-checked:bg-accent-purple peer-checked:text-white cursor-pointer transition-all hover:border-accent-purple/50 flex flex-col items-center justify-center glass-effect-light"
                         >
-                          <span className="font-medium">${range.replace('-', '-$').replace('+', '+')}</span>
+                          <span className="font-medium">₹{range.replace('-', '-₹')}</span>
                           <span className="text-xs mt-1 text-silver-dark opacity-80">
-                            {index === 0 ? 'Basic' : index === 1 ? 'Standard' : index === 2 ? 'Premium' : 'Enterprise'}
+                            {index === 0 ? 'Landing Page' : index === 1 ? 'Portfolio Site' : index === 2 ? 'Business Site' : 'E-commerce'}
                           </span>
                         </label>
                       </div>
