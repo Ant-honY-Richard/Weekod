@@ -1,0 +1,90 @@
+🔧✨ Prompt for Enhancing Weekod Website
+✅ 1. Logo Integration (SVG)
+Replace the current logo with the provided SVG logo code.
+
+Ensure it is scalable (responsive) and optimized for both desktop and mobile.
+
+Embed it directly into HTML/CSS or import as a component depending on your stack.
+
+✅ 2. Fix "Get In Touch" Overlapping on Mobile
+On smaller viewports:
+
+Add margin or padding below the logo.
+
+Scale down the section if needed (consider max-height or adjusting flex/grid layout).
+
+Ensure form spacing is fluid (e.g., using clamp() or media queries).
+
+✅ 3. Icons/SVG for “Services” and “Technology We Use”
+Add unique and futuristic icons or SVGs (e.g., for Web Dev, Mobile Apps, APIs, React, MongoDB, Firebase, etc.).
+
+Recommended: Use lucide-react, HeroIcons, or SVGs from unDraw or IconScout.
+
+Align them symmetrically and animate on hover (subtle scale or glow effect).
+
+✅ 4. Link Navbar Headings to Sections (Anchor Scroll)
+Add IDs to each section (id="services", id="technology", etc.).
+
+Update each navbar link:
+
+html
+Copy
+Edit
+<a href="#services">Services</a>
+<a href="#technology">Technology</a>
+Add smooth scroll behavior via:
+
+css
+Copy
+Edit
+html {
+  scroll-behavior: smooth;
+}
+✅ 5. Budget Section Improvements
+Replace the old dollar-based budget selector.
+
+Change to ₹ (INR - Indian Rupee).
+
+📊 Suggested Updated Pricing (Based on April 2025 Research):
+Service	Suggested Price (INR)
+Landing Page Design	₹3,000 – ₹7,000
+Portfolio Website	₹8,000 – ₹15,000
+Business Website	₹15,000 – ₹30,000
+E-Commerce Website	₹25,000 – ₹50,000+
+Web App (Dashboard + Auth)	₹40,000 – ₹1,00,000+
+Mobile App Development	₹60,000 – ₹1,50,000+
+Full Stack Custom Solution	₹80,000 – ₹2,50,000+
+Include dynamic slider, dropdown, or toggle UI for service and budget selection.
+
+✅ 6. Send Form Data to MongoDB (Backend Integration)
+🔐 MongoDB Atlas SRV Connection:
+ruby
+Copy
+Edit
+mongodb+srv://anthonyrichardkdc2020bcamlbd:XNPt2izXScGKDy0E@cluster1.k3vfqiw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1
+🎯 Backend Steps:
+Create API route /api/submit (or similar) to handle form POST requests.
+
+Use express.json() to parse incoming data.
+
+Connect using the MongoDB URI.
+
+Create contacts or projects collection to store:
+
+json
+Copy
+Edit
+{
+  "name": "Client Name",
+  "email": "client@example.com",
+  "phone": "+91XXXXXXXXXX",
+  "service": "Web App",
+  "budget": "₹80,000 – ₹1,00,000",
+  "message": "Project description..."
+}
+✅ Bonus Enhancements:
+Add loading states on button click.
+
+Show a success toast or thank you modal after form submission.
+
+Add reCAPTCHA to prevent spam.

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400">
+  <!-- Wing Logo -->
+  <g fill="#f5f5f5">
+    <!-- Left Wing Upper -->
+    <path d="M200 120 C160 150, 140 190, 150 250 C130 210, 140 140, 200 120" />
+    <!-- Left Wing Lower -->
+    <path d="M160 160 C120 190, 100 230, 110 290 C90 250, 100 180, 160 160" />
+    <!-- Right Wing Upper -->
+    <path d="M300 120 C340 150, 360 190, 350 250 C370 210, 360 140, 300 120" />
+    <!-- Right Wing Lower -->
+    <path d="M340 160 C380 190, 400 230, 390 290 C410 250, 400 180, 340 160" />
+    <!-- Center Element -->
+    <path d="M250 160 L230 220 L250 280 L270 220 Z" />
+  </g>
+</svg>
