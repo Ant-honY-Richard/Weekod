@@ -7,8 +7,8 @@ import Home from "@/pages/home";
 import { AnimatePresence } from "framer-motion";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import MobileMenu from "@/components/layout/MobileMenu";
 import { useState } from "react";
+import { InteractiveFeatures } from "@/components/ui/interactive-features";
 
 function Router() {
   return (
@@ -36,7 +36,7 @@ function App() {
           </AnimatePresence>
         </main>
         <Footer />
-        <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
+        <InteractiveFeatures />
       </div>
       <Toaster />
     </QueryClientProvider>

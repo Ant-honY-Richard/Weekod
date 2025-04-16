@@ -37,7 +37,15 @@
   
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 5rem;
+    scroll-padding-top: 6rem;
+    height: 100%;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+  }
+  
+  body {
+    min-height: 100%;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    position: relative;
   }
 
   * {
@@ -449,3 +457,210 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
 }
+
+/* Glitter floating background */
+.glitter-bg {
+  background: radial-gradient(circle, rgba(183,33,255,0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: glitterMove 20s linear infinite;
+  opacity: 0.2;
+  z-index: 0;
+}
+
+@keyframes glitterMove {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 1000px 1000px;
+  }
+}
+
+/* Mirror shine (text sweep effect) */
+.shining-text {
+  position: relative;
+  overflow: hidden;
+}
+
+.shining-text::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+  transform: skewX(-30deg);
+  animation: shine 5s ease-in-out infinite;
+}
+
+@keyframes shine {
+  0% {
+    left: -75%;
+  }
+  100% {
+    left: 125%;
+  }
+}
+
+/* Logo shine effect */
+.logo-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-shine::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(183,33,255,0.1) 0%, transparent 50%);
+  animation: logoShine 8s ease-in-out infinite;
+}
+
+@keyframes logoShine {
+  0%, 100% {
+    transform: translate(-30%, -30%) rotate(0deg);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate(-30%, -30%) rotate(180deg);
+    opacity: 0.6;
+  }
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(2px, -2px); }
+  60% { transform: translate(-1px, 1px); }
+  80% { transform: translate(1px, -1px); }
+  100% { transform: translate(0); }
+}
+
+.animate-glitch {
+  animation: glitch 1.2s infinite;
+}
+
+@keyframes neonGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px #f0f, 0 0 10px #f0f, 0 0 15px #f0f;
+  }
+  50% {
+    box-shadow: 0 0 10px #f0f, 0 0 20px #f0f, 0 0 30px #f0f;
+  }
+}
+
+.animate-neon-glow {
+  animation: neonGlow 2s ease-in-out infinite;
+}
+
+/* Custom Call Scheduler Button Styles */
+.btn-6 {
+  background: rgb(233, 87, 150);
+  background: radial-gradient(circle, rgb(239, 25, 117) 0%, rgb(157, 89, 186) 100%);
+  line-height: normal;
+  padding: 0;
+  border: none;
+  position: relative;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.btn-6 span {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 1.15rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-align: center;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.btn-6:before,
+.btn-6:after {
+  position: absolute;
+  content: "";
+  height: 0%;
+  width: 1px;
+  box-shadow:
+    -1px -1px 20px 0px rgba(255,255,255,1),
+    -4px -4px 5px 0px rgba(255,255,255,1),
+    7px 7px 20px 0px rgba(0,0,0,.4),
+    4px 4px 5px 0px rgba(0,0,0,.3);
+}
+
+.btn-6:before {
+  right: 0;
+  top: 0;
+  transition: all 500ms ease;
+}
+
+.btn-6:after {
+  left: 0;
+  bottom: 0;
+  transition: all 500ms ease;
+}
+
+.btn-6:hover {
+  background: transparent;
+  color: #76aef1;
+  box-shadow: none;
+}
+
+.btn-6:hover:before {
+  transition: all 500ms ease;
+  height: 100%;
+}
+
+.btn-6:hover:after {
+  transition: all 500ms ease;
+  height: 100%;
+}
+
+.btn-6 span:before,
+.btn-6 span:after {
+  position: absolute;
+  content: "";
+  box-shadow:
+    -1px -1px 20px 0px rgba(255,255,255,1),
+    -4px -4px 5px 0px rgba(255,255,255,1),
+    7px 7px 20px 0px rgba(0,0,0,.4),
+    4px 4px 5px 0px rgba(0,0,0,.3);
+}
+
+.btn-6 span:before {
+  left: 0;
+  top: 0;
+  width: 0%;
+  height: .5px;
+  transition: all 500ms ease;
+}
+
+.btn-6 span:after {
+  right: 0;
+  bottom: 0;
+  width: 0%;
+  height: .5px;
+  transition: all 500ms ease;
+}
+
+.btn-6:hover span:before {
+  width: 100%;
+}
+
+.btn-6:hover span:after {
+  width: 100%;
+}
+
+.btn-6:hover span {
+  color: #76aef1;
+}
+

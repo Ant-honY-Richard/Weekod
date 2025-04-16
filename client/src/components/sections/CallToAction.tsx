@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'wouter';
 import GradientText from '@/components/ui/gradient-text';
 import GradientBorder from '@/components/ui/gradient-border';
+import { CallScheduler } from '@/components/ui/call-scheduler';
 
 const CallToAction = () => {
   return (
@@ -43,6 +44,7 @@ const CallToAction = () => {
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  className="w-full sm:w-auto"
                 >
                   <a 
                     href="#contact"
@@ -54,13 +56,9 @@ const CallToAction = () => {
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  className="w-full sm:w-auto"
                 >
-                  <a 
-                    href="#" 
-                    className="btn-hover-effect inline-block w-full px-8 py-4 rounded-full text-silver border border-silver hover:text-white hover:border-white text-center transition-colors"
-                  >
-                    Schedule a Call
-                  </a>
+                  <CallScheduler />
                 </motion.div>
               </div>
             </motion.div>

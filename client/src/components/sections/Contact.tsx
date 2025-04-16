@@ -3,6 +3,13 @@ import { useState, FormEvent } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import GradientText from '@/components/ui/gradient-text';
 
+// Budget options for the application
+const BUDGET_OPTIONS = [
+  { id: 'budget-1', value: '5000-8000', label: 'Landing Page', price: '₹5,000-₹8,000', description: 'Single page with essential info', icon: '🚀', features: ['Responsive design', 'Contact form', 'Basic SEO'] },
+  { id: 'budget-2', value: '12000-25000', label: 'Business Website', price: '₹12,000-₹25,000', description: 'Multi-page professional site', icon: '💼', features: ['Up to 7 pages', 'CMS integration', 'Advanced SEO'] },
+  { id: 'budget-3', value: '50000-150000', label: 'Full-Stack App', price: '₹50,000-₹150,000', description: 'Complex web application', icon: '⚙️', features: ['Custom functionality', 'User accounts', 'Payment processing'] }
+];
+
 const Contact = () => {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
@@ -169,94 +176,167 @@ const Contact = () => {
               </div>
               
               <div>
-                <label htmlFor="budget" className="block text-silver mb-4">Budget Range</label>
-                <div className="space-y-6">
-                  <div className="relative">
-                    <input 
-                      type="range" 
-                      id="budget_slider" 
-                      name="budget_slider"
-                      min="5000" 
-                      max="150000" 
-                      step="5000"
-                      className="w-full h-2 appearance-none rounded-full bg-dark-600 cursor-pointer accent-accent-purple"
-                      defaultValue="15000"
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value);
-                        let budgetRange = '';
-                        
-                        if (value <= 8000) budgetRange = '5000-8000';
-                        else if (value <= 25000) budgetRange = '12000-25000';
-                        else if (value <= 150000) budgetRange = '50000-150000';
-                        else budgetRange = '150000+';
-                        
-                        setFormData({
-                          ...formData,
-                          budget: budgetRange
-                        });
-                      }}
-                    />
-                    <div className="absolute top-6 left-0 right-0 flex justify-between text-xs text-silver-dark">
-                      <span>₹5,000</span>
-                      <span>₹50,000</span>
-                      <span>₹150,000+</span>
-                    </div>
-                  </div>
-                  
-                  <div id="budget" className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-12">
-                    {[
-                      {label: "Landing Page", price: "5000-8000", description: "Single page with essential info"},
-                      {label: "Business Website", price: "12000-25000", description: "Multi-page professional site"},
-                      {label: "Full-Stack App", price: "50000-150000", description: "Complex web application"}
-                    ].map((tier, index) => (
-                      <div className="flex items-center" key={index}>
-                        <input 
-                          type="radio" 
-                          id={`budget${index + 1}`} 
-                          name="budget" 
-                          value={tier.price}
-                          onChange={handleInputChange}
-                          checked={formData.budget === tier.price}
-                          className="hidden peer" 
+                <label className="block text-silver mb-6 text-lg font-medium">Budget Range</label>
+                
+                {/* New Budget Selection UI */}
+                <motion.div 
+                  className="space-y-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ staggerChildren: 0.1, delayChildren: 0.1 }}
+                >
+                  {BUDGET_OPTIONS.map((option, index) => (
+                    <motion.div
+                      key={option.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: index * 0.1 }}
+                      className="relative"
+                    >
+                      <input
+                        type="radio"
+                        id={option.id}
+                        name="budget"
+                        value={option.value}
+                        checked={formData.budget === option.value}
+                        onChange={handleInputChange}
+                        className="peer sr-only"
+                      />
+                      
+                      <motion.label
+                        htmlFor={option.id}
+                        className="flex items-start p-5 cursor-pointer rounded-xl border-2 border-dark-600 bg-dark-700 transition-all duration-300 overflow-hidden relative"
+                        whileHover={{ 
+                          borderColor: "rgba(124, 58, 237, 0.5)",
+                          y: -4,
+                          boxShadow: "0 10px 25px -5px rgba(124, 58, 237, 0.15)"
+                        }}
+                        animate={{
+                          borderColor: formData.budget === option.value ? "rgb(236, 72, 153)" : "rgba(31, 41, 55, 1)",
+                          backgroundColor: formData.budget === option.value ? "rgba(124, 58, 237, 0.15)" : "rgba(17, 24, 39, 1)",
+                        }}
+                      >
+                        {/* Selection indicator */}
+                        <motion.div 
+                          className={`absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-accent-purple to-accent-magenta transition-all duration-300 ${formData.budget === option.value ? 'opacity-100' : 'opacity-0'}`}
+                          animate={{ 
+                            scaleY: formData.budget === option.value ? 1 : 0,
+                          }}
+                          transition={{ type: "spring", stiffness: 400, damping: 10 }}
                         />
-                        <label 
-                          htmlFor={`budget${index + 1}`} 
-                          className="w-full text-center px-4 py-4 bg-dark-700 border border-dark-600 rounded-lg peer-checked:bg-accent-purple peer-checked:text-white cursor-pointer transition-all hover:border-accent-purple/50 flex flex-col items-center justify-center glass-effect-light relative group"
+                        
+                        {/* Background glow effect when selected */}
+                        {formData.budget === option.value && (
+                          <motion.div 
+                            className="absolute inset-0 bg-gradient-to-br from-accent-purple/5 to-accent-magenta/5"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                          />
+                        )}
+                        
+                        {/* Icon with animation */}
+                        <motion.div 
+                          className="flex items-center justify-center h-12 w-12 rounded-full bg-dark-800 text-2xl mr-4 flex-shrink-0 relative overflow-hidden"
+                          animate={{
+                            backgroundColor: formData.budget === option.value ? "rgba(124, 58, 237, 0.2)" : "rgba(17, 24, 39, 1)",
+                          }}
                         >
-                          <span className="font-medium text-lg">{tier.label}</span>
-                          <span className="font-medium text-accent-magenta peer-checked:text-white mt-1">₹{tier.price.replace('-', '-₹')}</span>
-                          <span className="text-xs mt-2 text-silver-dark opacity-80 px-2">
-                            {tier.description}
-                          </span>
-                          {/* Tooltip on hover */}
-                          <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-dark-800 p-3 rounded-lg shadow-xl invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-300 w-48 z-20 text-xs text-silver">
-                            <p className="font-medium mb-1">{tier.label} Includes:</p>
-                            <ul className="list-disc pl-4 text-left">
-                              {index === 0 ? 
-                                <>
-                                  <li>Responsive design</li>
-                                  <li>Contact form</li>
-                                  <li>Basic SEO</li>
-                                </> : 
-                                index === 1 ? 
-                                <>
-                                  <li>Up to 7 pages</li>
-                                  <li>CMS integration</li>
-                                  <li>Advanced SEO</li>
-                                </> :
-                                <>
-                                  <li>Custom functionality</li>
-                                  <li>User accounts</li>
-                                  <li>Payment processing</li>
-                                </>
-                              }
-                            </ul>
+                          <motion.div
+                            animate={{ 
+                              scale: formData.budget === option.value ? [1, 1.2, 1] : 1,
+                              rotate: formData.budget === option.value ? [0, 10, -10, 0] : 0
+                            }}
+                            transition={{ duration: 0.5 }}
+                          >
+                            {option.icon}
+                          </motion.div>
+                          
+                          {/* Ripple effect when selected */}
+                          {formData.budget === option.value && (
+                            <motion.div 
+                              className="absolute inset-0 rounded-full bg-accent-purple/20"
+                              initial={{ scale: 0, opacity: 1 }}
+                              animate={{ scale: 1.5, opacity: 0 }}
+                              transition={{ duration: 1, repeat: Infinity, repeatDelay: 1 }}
+                            />
+                          )}
+                        </motion.div>
+                        
+                        <div className="flex-1">
+                          <div className="flex justify-between items-center mb-1">
+                            <motion.h3 
+                              className="font-medium text-lg"
+                              animate={{ 
+                                color: formData.budget === option.value ? "rgb(255, 255, 255)" : "rgb(229, 231, 235)"
+                              }}
+                            >
+                              {option.label}
+                            </motion.h3>
+                            
+                            {/* Checkmark for selected option */}
+                            {formData.budget === option.value && (
+                              <motion.div 
+                                className="h-6 w-6 bg-accent-magenta rounded-full flex items-center justify-center"
+                                initial={{ scale: 0, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0, opacity: 0 }}
+                                transition={{ type: "spring", stiffness: 500, damping: 15 }}
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              </motion.div>
+                            )}
                           </div>
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                          
+                          <motion.p 
+                            className="font-medium text-accent-magenta mb-2"
+                            animate={{ 
+                              color: formData.budget === option.value ? "rgb(255, 255, 255)" : "rgb(236, 72, 153)"
+                            }}
+                          >
+                            {option.price}
+                          </motion.p>
+                          
+                          <p className="text-sm text-silver-dark mb-3">
+                            {option.description}
+                          </p>
+                          
+                          {/* Features list */}
+                          <motion.ul 
+                            className="grid grid-cols-1 gap-1 mt-2"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ 
+                              opacity: formData.budget === option.value ? 1 : 0.7,
+                              height: "auto"
+                            }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            {option.features.map((feature, i) => (
+                              <motion.li 
+                                key={i}
+                                className="flex items-center text-xs text-silver-dark"
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ 
+                                  opacity: formData.budget === option.value ? 1 : 0.7,
+                                  x: 0
+                                }}
+                                transition={{ duration: 0.3, delay: i * 0.1 }}
+                              >
+                                <svg className="w-3 h-3 mr-1.5 text-accent-magenta flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
+                                </svg>
+                                {feature}
+                              </motion.li>
+                            ))}
+                          </motion.ul>
+                        </div>
+                      </motion.label>
+                    </motion.div>
+                  ))}
+                </motion.div>
               </div>
               
               <motion.button 
@@ -330,10 +410,10 @@ const Contact = () => {
                 <div>
                   <h4 className="text-xl font-display font-semibold mb-2">Call Us</h4>
                   <p className="text-silver">
-                    <a href="tel:+15551234567" className="hover:text-accent-magenta transition-colors">+1 (555) 123-4567</a>
+                    <a href="tel:+15551234567" className="hover:text-accent-magenta transition-colors">+91 88844 60329</a>
                   </p>
                   <p className="text-silver">
-                    <a href="tel:+15559876543" className="hover:text-accent-magenta transition-colors">+1 (555) 987-6543</a>
+                    <a href="tel:+15559876543" className="hover:text-accent-magenta transition-colors">+91 78992 42883</a>
                   </p>
                 </div>
               </div>

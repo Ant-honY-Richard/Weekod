@@ -16,39 +16,42 @@ const Technologies = () => {
   };
 
   return (
-    <section className="py-20 gradient-bg">
-      <div className="container mx-auto px-4">
-        <motion.div 
-          className="text-center max-w-3xl mx-auto mb-16"
+    <section id="technologies" className="py-20 bg-dark-800">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-4xl font-display font-bold mb-6">
-            The <GradientText>Technology</GradientText> We Use
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6">
+            Our Technology Stack
           </h2>
-          <p className="text-silver">
-            We leverage the latest technologies to deliver high-performance, scalable, and secure websites and applications.
+          <p className="text-lg sm:text-xl text-silver max-w-3xl mx-auto">
+            We use cutting-edge technologies to build robust and scalable
+            applications.
           </p>
         </motion.div>
-        
-        <motion.div 
-          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8 text-center"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
-        >
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {technologies.map((tech, index) => (
-            <TechCard 
-              key={index}
-              icon={tech.icon}
-              name={tech.name}
-              color={tech.color}
-            />
+            <motion.div
+              key={tech.name}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="bg-dark-700 rounded-xl p-6 sm:p-8 hover:bg-dark-600 transition-all duration-300"
+            >
+              {/* <div className="text-accent-purple mb-6">{tech.icon}</div> */}
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-4">
+                {tech.name}
+              </h3>
+              <p className="text-silver">{tech.description}</p>
+            </motion.div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
