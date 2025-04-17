@@ -94,7 +94,7 @@ export function CallScheduler() {
     setOpen(false);
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step === 'info') {
       setStep('date');
     } else if (step === 'date') {
@@ -102,9 +102,41 @@ export function CallScheduler() {
     } else if (step === 'time') {
       setStep('confirmation');
     } else if (step === 'confirmation') {
-      // Here you would typically send the data to your backend
-      // For now, we'll just simulate a successful booking
-      setStep('success');
+      try {
+        // Format the date and time for the API
+        const scheduledDateTime = new Date(date!);
+        const [hours, minutes, period] = time!.match(/(\d+):(\d+)\s+([AP]M)/)!.slice(1);
+        let hour = parseInt(hours);
+        if (period === 'PM' && hour !== 12) hour += 12;
+        if (period === 'AM' && hour === 12) hour = 0;
+        
+        scheduledDateTime.setHours(hour, parseInt(minutes), 0);
+        
+        // Send the data to the backend
+        const response = await fetch('/api/schedule-call', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            customerName: name,
+            customerEmail: email,
+            timeZone: timezone,
+            scheduledTime: scheduledDateTime.toISOString(),
+            message: `Call scheduled from website for ${name} (${email})`
+          }),
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to schedule call');
+        }
+        
+        setStep('success');
+      } catch (error) {
+        console.error('Error scheduling call:', error);
+        // Show error but stay on confirmation page
+        alert('There was an error scheduling your call. Please try again.');
+      }
     }
   };
 
