@@ -35,18 +35,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // API routes for contact form
   app.post('/api/contact', async (req: Request, res: Response) => {
     try {
-      const { name, email, company, service, budget, message } = req.body;
+      console.log("Contact form submission received:", req.body);
+      
+      const { 
+        name, 
+        email, 
+        company, 
+        service, 
+        budget, 
+        message, 
+        projectSummary, 
+        estimatedTimeline, 
+        estimatedDeliveryDate,
+        // Extract individual calculator fields
+        websiteType,
+        complexity,
+        features,
+        supportPlan
+      } = req.body;
       
       log(`Contact form submission received from: ${name} (${email})`, 'contact');
+      log(`Form data: ${JSON.stringify(req.body)}`, 'contact');
+      
+      // Log detailed budget calculator information
+      log(`Budget Calculator Details:`, 'contact');
+      log(`Website Type: ${websiteType}`, 'contact');
+      log(`Complexity: ${complexity}`, 'contact');
+      log(`Selected Features: ${features}`, 'contact');
+      log(`Support Plan: ${supportPlan}`, 'contact');
+      log(`Estimated Budget: $${budget}`, 'contact');
+      log(`Estimated Timeline: ${estimatedTimeline} days`, 'contact');
+      log(`Estimated Delivery Date: ${estimatedDeliveryDate}`, 'contact');
       
       // Validate required fields
       if (!name || !email || !message) {
         log('Contact form validation failed: Missing required fields', 'contact');
+        log(`Received: name=${name}, email=${email}, message=${message}`, 'contact');
         return res.status(400).json({ message: 'Name, email, and message are required' });
       }
       
       try {
-        // Save contact form as a task
+        // Save contact form as a task with detailed budget calculator information
         const task = new Task({
           customerName: name,
           customerEmail: email,
@@ -55,7 +84,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           projectDetails: message,
           budget: parseFloat(budget) || 0,
           status: TaskStatus.RECEIVED,
-          referredBy: 'web'
+          referredBy: 'web',
+          projectSummary: projectSummary || '',
+          estimatedTimeline: parseInt(estimatedTimeline) || 0,
+          estimatedDeliveryDate: estimatedDeliveryDate || '',
+          // Add detailed budget calculator fields
+          websiteType: websiteType || '',
+          complexity: complexity || '',
+          features: features || '[]',
+          supportPlan: supportPlan || ''
         });
         
         await task.save();

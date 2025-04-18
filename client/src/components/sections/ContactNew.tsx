@@ -84,45 +84,39 @@ const Contact = () => {
         return;
       }
       
-      // Create detailed project summary with all calculator data
-      const projectDetails = {
+      // Create FormData object for form submission
+      const formDataObj = new FormData();
+      
+      // Add all form fields
+      Object.entries(formData).forEach(([key, value]) => {
+        formDataObj.append(key, value);
+        console.log(`Adding form field: ${key} = ${value}`);
+      });
+      
+      // Add budget calculator data
+      formDataObj.append('budget', calculatorData.total.toString());
+      formDataObj.append('estimatedTimeline', calculatorData.totalDays.toString());
+      formDataObj.append('estimatedDeliveryDate', calculatorData.estimatedDeliveryDate);
+      console.log("Added budget data:", calculatorData.total, calculatorData.totalDays, calculatorData.estimatedDeliveryDate);
+      
+      // Create project summary from calculator data
+      const projectSummary = JSON.stringify({
         websiteType: calculatorData.selectedType,
         complexity: calculatorData.complexity,
         features: calculatorData.selectedFeatures,
         supportPlan: calculatorData.selectedSupport,
         total: calculatorData.total,
         timeline: calculatorData.totalDays
-      };
+      });
       
-      // Convert to JSON string for storage
-      const projectSummary = JSON.stringify(projectDetails);
-      
-      console.log("Created project summary:", projectSummary);
+      formDataObj.append('projectSummary', projectSummary);
+      console.log("Added project summary:", projectSummary);
       
       console.log("Sending data to backend...");
-      // Create JSON object for the API with all calculator data as individual fields
-      const jsonData = {
-        ...formData,
-        budget: calculatorData.total.toString(),
-        estimatedTimeline: calculatorData.totalDays.toString(),
-        estimatedDeliveryDate: calculatorData.estimatedDeliveryDate,
-        projectSummary: projectSummary,
-        // Add individual calculator fields for easier access in backend
-        websiteType: calculatorData.selectedType,
-        complexity: calculatorData.complexity,
-        features: JSON.stringify(calculatorData.selectedFeatures),
-        supportPlan: calculatorData.selectedSupport
-      };
-      
-      console.log("Sending JSON data:", jsonData);
-      
       // Only send data to backend when form is submitted
       const response = await fetch('/api/contact', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(jsonData),
+        body: formDataObj,
       });
 
       if (response.ok) {

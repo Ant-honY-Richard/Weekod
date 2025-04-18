@@ -30,6 +30,8 @@ const Contact = () => {
   });
 
   const [submitting, setSubmitting] = useState(false);
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const budgetCalculatorRef = useRef<any>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -40,6 +42,24 @@ const Contact = () => {
     });
   };
   
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      if (file.type === 'application/pdf') {
+        setPdfFile(file);
+      } else {
+        toast({
+          title: "Invalid file type",
+          description: "Please upload a PDF file",
+          variant: "destructive",
+        });
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      }
+    }
+  };
+
   // Function to get budget calculator data only when needed
   const getBudgetData = () => {
     if (budgetCalculatorRef.current && typeof budgetCalculatorRef.current.getCalculatorData === 'function') {
@@ -84,45 +104,45 @@ const Contact = () => {
         return;
       }
       
-      // Create detailed project summary with all calculator data
-      const projectDetails = {
+      // Create FormData object to handle file upload
+      const formDataObj = new FormData();
+      
+      // Add all form fields
+      Object.entries(formData).forEach(([key, value]) => {
+        formDataObj.append(key, value);
+        console.log(`Adding form field: ${key} = ${value}`);
+      });
+      
+      // Add budget calculator data
+      formDataObj.append('budget', calculatorData.total.toString());
+      formDataObj.append('estimatedTimeline', calculatorData.totalDays.toString());
+      formDataObj.append('estimatedDeliveryDate', calculatorData.estimatedDeliveryDate);
+      console.log("Added budget data:", calculatorData.total, calculatorData.totalDays, calculatorData.estimatedDeliveryDate);
+      
+      // Create project summary from calculator data
+      const projectSummary = JSON.stringify({
         websiteType: calculatorData.selectedType,
         complexity: calculatorData.complexity,
         features: calculatorData.selectedFeatures,
         supportPlan: calculatorData.selectedSupport,
         total: calculatorData.total,
         timeline: calculatorData.totalDays
-      };
+      });
       
-      // Convert to JSON string for storage
-      const projectSummary = JSON.stringify(projectDetails);
+      formDataObj.append('projectSummary', projectSummary);
+      console.log("Added project summary:", projectSummary);
       
-      console.log("Created project summary:", projectSummary);
-      
+      // Add PDF file if it exists
+      if (pdfFile) {
+        formDataObj.append('projectDocument', pdfFile);
+        console.log("Added PDF file:", pdfFile.name);
+      }
+
       console.log("Sending data to backend...");
-      // Create JSON object for the API with all calculator data as individual fields
-      const jsonData = {
-        ...formData,
-        budget: calculatorData.total.toString(),
-        estimatedTimeline: calculatorData.totalDays.toString(),
-        estimatedDeliveryDate: calculatorData.estimatedDeliveryDate,
-        projectSummary: projectSummary,
-        // Add individual calculator fields for easier access in backend
-        websiteType: calculatorData.selectedType,
-        complexity: calculatorData.complexity,
-        features: JSON.stringify(calculatorData.selectedFeatures),
-        supportPlan: calculatorData.selectedSupport
-      };
-      
-      console.log("Sending JSON data:", jsonData);
-      
       // Only send data to backend when form is submitted
       const response = await fetch('/api/contact', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(jsonData),
+        body: formDataObj,
       });
 
       if (response.ok) {
@@ -141,6 +161,10 @@ const Contact = () => {
         // Reset budget calculator if possible
         if (budgetCalculatorRef.current && typeof budgetCalculatorRef.current.resetCalculator === 'function') {
           budgetCalculatorRef.current.resetCalculator();
+        }
+        setPdfFile(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
         }
       } else {
         toast({
@@ -280,6 +304,63 @@ const Contact = () => {
                 </div>
               </div>
               
+              {/* PDF Upload Field */}
+              <div>
+                <label className="block text-silver mb-1 text-sm">
+                  Project Document (PDF)
+                </label>
+                <div className="flex items-center justify-center w-full">
+                  <label 
+                    htmlFor="projectDocument" 
+                    className="flex flex-col items-center justify-center w-full h-20 border-2 border-dashed rounded-lg cursor-pointer bg-dark-700 border-dark-600 hover:border-accent-purple transition-colors"
+                  >
+                    <div className="flex items-center justify-center p-2">
+                      <svg 
+                        className="w-5 h-5 mr-2 text-silver" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24" 
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth="2" 
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                        ></path>
+                      </svg>
+                      <div>
+                        <p className="text-xs text-silver">
+                          <span className="font-semibold">Click to upload</span> PDF (MAX. 10MB)
+                        </p>
+                        {pdfFile && (
+                          <p className="text-xs text-accent-magenta font-medium truncate max-w-[200px]">
+                            {pdfFile.name}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <input 
+                      id="projectDocument" 
+                      type="file" 
+                      accept=".pdf" 
+                      className="hidden" 
+                      onChange={handleFileChange}
+                      ref={fileInputRef}
+                    />
+                  </label>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-silver mb-2 text-sm font-medium">Budget Calculator</label>
+                
+                {/* Budget Calculator */}
+                <div className="w-full bg-dark-800/50 rounded-lg p-3 shadow-lg">
+                  <BudgetCalculator ref={budgetCalculatorRef} />
+                </div>
+              </div>
+              
               <motion.button 
                 type="submit" 
                 className="btn-hover-effect w-full bg-gradient-to-r from-accent-purple to-accent-magenta px-6 py-3 rounded-full text-white font-medium text-sm transition-all hover:shadow-lg hover:shadow-accent-purple/20 flex justify-center items-center"
@@ -298,8 +379,8 @@ const Contact = () => {
             </form>
           </motion.div>
           
-          {/* Right Column: Contact Info */}
-          <div className="w-full">
+          {/* Right Column: Contact Info + FAQ */}
+          <div className="space-y-8 w-full">
             {/* Contact Info */}
             <motion.div 
               className="p-6 md:p-8 bg-dark-800/50 rounded-xl lg:pl-8 shadow-lg w-full"
@@ -378,51 +459,20 @@ const Contact = () => {
                 </div>
               </div>
             </motion.div>
+            
+            {/* FAQ Section */}
+            <motion.div
+              className="bg-dark-800/50 rounded-xl p-4 md:p-6 shadow-lg w-full"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <h3 className="text-xl font-display font-semibold mb-4">Frequently Asked Questions</h3>
+              <FAQSection compact={true} />
+            </motion.div>
           </div>
         </div>
-        
-        {/* Budget Calculator Section */}
-        <motion.div 
-          className="mt-16 bg-dark-800 rounded-xl p-6 shadow-lg w-full max-w-screen-xl mx-auto"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="text-center mb-8">
-            <h3 className="text-2xl md:text-3xl font-display font-bold mb-4">
-              Budget <GradientText>Calculator</GradientText>
-            </h3>
-            <p className="text-silver text-sm md:text-base max-w-2xl mx-auto">
-              Use our interactive budget calculator to estimate the cost and timeline for your project. 
-              This will help us understand your needs better when you submit the contact form.
-            </p>
-          </div>
-          
-          <div className="w-full bg-dark-800/50 rounded-lg p-4 shadow-inner">
-            <BudgetCalculator ref={budgetCalculatorRef} />
-          </div>
-        </motion.div>
-        
-        {/* FAQ Section */}
-        <motion.div 
-          className="mt-16 bg-dark-800/50 rounded-xl p-6 shadow-lg w-full max-w-screen-xl mx-auto"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <div className="text-center mb-8">
-            <h3 className="text-2xl md:text-3xl font-display font-bold mb-4">
-              Frequently Asked <GradientText>Questions</GradientText>
-            </h3>
-            <p className="text-silver text-sm md:text-base max-w-2xl mx-auto">
-              Find answers to common questions about our services, process, and pricing.
-            </p>
-          </div>
-          
-          <FAQSection />
-        </motion.div>
       </div>
     </section>
   );

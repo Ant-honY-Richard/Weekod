@@ -34,7 +34,9 @@ const TasksTable = ({ isAdmin, employeeId }: TasksTableProps) => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isFeaturesDialogOpen, setIsFeaturesDialogOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState<any>(null);
+  const [currentFeatures, setCurrentFeatures] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     customerName: '',
     customerEmail: '',
@@ -67,6 +69,44 @@ const TasksTable = ({ isAdmin, employeeId }: TasksTableProps) => {
       }
       
       const data = await response.json();
+      console.log('Fetched tasks:', data);
+      
+      // Log the first task to check if it has the budget calculator fields
+      if (data.length > 0) {
+        console.log('First task details:', {
+          id: data[0]._id,
+          websiteType: data[0].websiteType,
+          complexity: data[0].complexity,
+          features: data[0].features,
+          supportPlan: data[0].supportPlan,
+          projectSummary: data[0].projectSummary
+        });
+        
+        // If budget calculator fields are missing but projectSummary is present,
+        // try to extract the data from projectSummary
+        for (const task of data) {
+          if ((!task.websiteType || !task.complexity || !task.features || !task.supportPlan) && task.projectSummary) {
+            try {
+              const projectSummary = JSON.parse(task.projectSummary);
+              if (!task.websiteType && projectSummary.websiteType) {
+                task.websiteType = projectSummary.websiteType;
+              }
+              if (!task.complexity && projectSummary.complexity) {
+                task.complexity = projectSummary.complexity;
+              }
+              if (!task.features && projectSummary.features) {
+                task.features = JSON.stringify(projectSummary.features);
+              }
+              if (!task.supportPlan && projectSummary.supportPlan) {
+                task.supportPlan = projectSummary.supportPlan;
+              }
+            } catch (e) {
+              console.error('Error parsing projectSummary:', e);
+            }
+          }
+        }
+      }
+      
       setTasks(data);
     } catch (error: any) {
       toast({
@@ -242,7 +282,10 @@ const TasksTable = ({ isAdmin, employeeId }: TasksTableProps) => {
   };
 
   const openEditDialog = (task: any) => {
+    // Store the complete task object for reference (including budget calculator details)
     setCurrentTask(task);
+    
+    // Set form data for editable fields
     setFormData({
       customerName: task.customerName,
       customerEmail: task.customerEmail,
@@ -255,12 +298,78 @@ const TasksTable = ({ isAdmin, employeeId }: TasksTableProps) => {
       assignedTo: task.assignedTo?._id || 'unassigned',
       referredBy: task.referredBy || 'web'
     });
+    
     setIsEditDialogOpen(true);
   };
 
   const openDeleteDialog = (task: any) => {
     setCurrentTask(task);
     setIsDeleteDialogOpen(true);
+  };
+  
+  const viewFeatures = (task: any) => {
+    console.log('View Features called with task:', task);
+    console.log('Task features:', task.features);
+    console.log('Task projectSummary:', task.projectSummary);
+    
+    // Create a copy of the task to avoid modifying the original
+    const taskCopy = { ...task };
+    
+    // If budget calculator fields are missing but projectSummary is present,
+    // try to extract the data from projectSummary
+    if ((!taskCopy.websiteType || !taskCopy.complexity || !taskCopy.features || !taskCopy.supportPlan) && taskCopy.projectSummary) {
+      try {
+        console.log('Trying to extract data from projectSummary');
+        const projectSummary = JSON.parse(taskCopy.projectSummary);
+        
+        if (!taskCopy.websiteType && projectSummary.websiteType) {
+          taskCopy.websiteType = projectSummary.websiteType;
+        }
+        if (!taskCopy.complexity && projectSummary.complexity) {
+          taskCopy.complexity = projectSummary.complexity;
+        }
+        if (!taskCopy.features && projectSummary.features) {
+          taskCopy.features = JSON.stringify(projectSummary.features);
+        }
+        if (!taskCopy.supportPlan && projectSummary.supportPlan) {
+          taskCopy.supportPlan = projectSummary.supportPlan;
+        }
+      } catch (e) {
+        console.error('Error parsing projectSummary:', e);
+      }
+    }
+    
+    setCurrentTask(taskCopy);
+    try {
+      if (taskCopy.features) {
+        console.log('Parsing features:', taskCopy.features);
+        const features = JSON.parse(taskCopy.features);
+        console.log('Parsed features:', features);
+        setCurrentFeatures(features);
+      } else if (taskCopy.projectSummary) {
+        // Try to extract features from projectSummary as a fallback
+        try {
+          const projectSummary = JSON.parse(taskCopy.projectSummary);
+          if (projectSummary.features) {
+            console.log('Extracted features from projectSummary:', projectSummary.features);
+            setCurrentFeatures(projectSummary.features);
+          } else {
+            console.log('No features found in projectSummary');
+            setCurrentFeatures([]);
+          }
+        } catch (e) {
+          console.error('Error parsing projectSummary for features:', e);
+          setCurrentFeatures([]);
+        }
+      } else {
+        console.log('No features or projectSummary found in task');
+        setCurrentFeatures([]);
+      }
+    } catch (e) {
+      console.error('Error parsing features:', e);
+      setCurrentFeatures([]);
+    }
+    setIsFeaturesDialogOpen(true);
   };
 
   const getStatusBadge = (status: string) => {
@@ -312,6 +421,9 @@ const TasksTable = ({ isAdmin, employeeId }: TasksTableProps) => {
               <TableHead>Customer Email</TableHead>
               <TableHead>Company</TableHead>
               <TableHead>Service</TableHead>
+              <TableHead>Website Type</TableHead>
+              <TableHead>Complexity</TableHead>
+              <TableHead>Support Plan</TableHead>
               <TableHead>Budget</TableHead>
               <TableHead>Expenses</TableHead>
               <TableHead>Status</TableHead>
@@ -322,7 +434,7 @@ const TasksTable = ({ isAdmin, employeeId }: TasksTableProps) => {
           <TableBody>
             {tasks.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-8 text-gray-400">
+                <TableCell colSpan={12} className="text-center py-8 text-gray-400">
                   No tasks found
                 </TableCell>
               </TableRow>
@@ -333,6 +445,9 @@ const TasksTable = ({ isAdmin, employeeId }: TasksTableProps) => {
                   <TableCell>{task.customerEmail}</TableCell>
                   <TableCell>{task.customerCompany || '-'}</TableCell>
                   <TableCell>{task.serviceRequired}</TableCell>
+                  <TableCell>{task.websiteType || '-'}</TableCell>
+                  <TableCell>{task.complexity || '-'}</TableCell>
+                  <TableCell>{task.supportPlan || '-'}</TableCell>
                   <TableCell>₹{task.budget.toLocaleString()}</TableCell>
                   <TableCell>₹{task.expenses.toLocaleString()}</TableCell>
                   <TableCell>{getStatusBadge(task.status)}</TableCell>
@@ -346,6 +461,14 @@ const TasksTable = ({ isAdmin, employeeId }: TasksTableProps) => {
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="text-blue-500 border-blue-500 hover:bg-blue-950"
+                        onClick={() => viewFeatures(task)}
+                      >
+                        View Features
+                      </Button>
                       {isAdmin && (
                         <Button 
                           variant="outline" 
@@ -357,32 +480,47 @@ const TasksTable = ({ isAdmin, employeeId }: TasksTableProps) => {
                         </Button>
                       )}
                       {!isAdmin && (
-                        <Select
-                          value={task.status}
-                          onValueChange={(value) => {
-                            // Update task status
-                            const token = localStorage.getItem('token');
-                            fetch(`/api/tasks/${task._id}`, {
-                              method: 'PUT',
-                              headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${token}`
-                              },
-                              body: JSON.stringify({ status: value })
-                            })
-                              .then(response => {
-                                if (!response.ok) throw new Error('Failed to update status');
-                                return response.json();
+                        <>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="text-blue-500 border-blue-500 hover:bg-blue-950 mr-2"
+                            onClick={() => {
+                              console.log('Task details:', task);
+                              toast({
+                                title: 'Task Details',
+                                description: `Type: ${task.websiteType || 'N/A'}, Complexity: ${task.complexity || 'N/A'}, Support: ${task.supportPlan || 'N/A'}, Features: ${task.features ? 'Yes' : 'No'}`,
+                              });
+                            }}
+                          >
+                            Debug
+                          </Button>
+                          <Select
+                            value={task.status}
+                            onValueChange={(value) => {
+                              // Update task status
+                              const token = localStorage.getItem('token');
+                              fetch(`/api/tasks/${task._id}`, {
+                                method: 'PUT',
+                                headers: {
+                                  'Content-Type': 'application/json',
+                                  'Authorization': `Bearer ${token}`
+                                },
+                                body: JSON.stringify({ status: value })
                               })
-                              .then(() => {
-                                toast({
-                                  title: 'Status Updated',
-                                  description: 'Task status has been updated successfully',
-                                });
-                                fetchTasks();
-                              })
-                              .catch(error => {
-                                toast({
+                                .then(response => {
+                                  if (!response.ok) throw new Error('Failed to update status');
+                                  return response.json();
+                                })
+                                .then(() => {
+                                  toast({
+                                    title: 'Status Updated',
+                                    description: 'Task status has been updated successfully',
+                                  });
+                                  fetchTasks();
+                                })
+                                .catch(error => {
+                                  toast({
                                   title: 'Error',
                                   description: error.message,
                                   variant: 'destructive',
@@ -706,6 +844,71 @@ const TasksTable = ({ isAdmin, employeeId }: TasksTableProps) => {
                 </SelectContent>
               </Select>
             </div>
+            
+            {/* Budget Calculator Details Section */}
+            {currentTask && (currentTask.websiteType || currentTask.complexity || currentTask.features || currentTask.supportPlan) && (
+              <div className="mt-6 space-y-4 border border-gray-600 rounded-md p-4 bg-gray-700/50">
+                <h3 className="text-lg font-semibold border-b border-gray-600 pb-2">Budget Calculator Details</h3>
+                
+                {currentTask.websiteType && (
+                  <div className="grid grid-cols-2 gap-2">
+                    <p className="text-gray-300">Website Type:</p>
+                    <p className="font-medium">{currentTask.websiteType}</p>
+                  </div>
+                )}
+                
+                {currentTask.complexity && (
+                  <div className="grid grid-cols-2 gap-2">
+                    <p className="text-gray-300">Complexity Level:</p>
+                    <p className="font-medium">{currentTask.complexity}</p>
+                  </div>
+                )}
+                
+                {currentTask.features && (
+                  <div className="grid grid-cols-2 gap-2">
+                    <p className="text-gray-300">Selected Features:</p>
+                    <div>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="text-blue-500 border-blue-500 hover:bg-blue-950"
+                        onClick={() => viewFeatures(currentTask)}
+                      >
+                        View All Features
+                      </Button>
+                    </div>
+                  </div>
+                )}
+                
+                {currentTask.supportPlan && (
+                  <div className="grid grid-cols-2 gap-2">
+                    <p className="text-gray-300">Support Plan:</p>
+                    <p className="font-medium">{currentTask.supportPlan}</p>
+                  </div>
+                )}
+                
+                {currentTask.budget > 0 && (
+                  <div className="grid grid-cols-2 gap-2">
+                    <p className="text-gray-300">Estimated Budget:</p>
+                    <p className="font-medium">${currentTask.budget.toFixed(2)}</p>
+                  </div>
+                )}
+                
+                {currentTask.estimatedTimeline > 0 && (
+                  <div className="grid grid-cols-2 gap-2">
+                    <p className="text-gray-300">Estimated Timeline:</p>
+                    <p className="font-medium">{currentTask.estimatedTimeline} days</p>
+                  </div>
+                )}
+                
+                {currentTask.estimatedDeliveryDate && (
+                  <div className="grid grid-cols-2 gap-2">
+                    <p className="text-gray-300">Estimated Delivery Date:</p>
+                    <p className="font-medium">{currentTask.estimatedDeliveryDate}</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
@@ -728,6 +931,12 @@ const TasksTable = ({ isAdmin, employeeId }: TasksTableProps) => {
               <div className="mt-4 p-4 bg-gray-700 rounded-md">
                 <p><strong>Customer:</strong> {currentTask.customerName}</p>
                 <p><strong>Service:</strong> {currentTask.serviceRequired}</p>
+                {currentTask.budget > 0 && (
+                  <p><strong>Budget:</strong> ${currentTask.budget.toFixed(2)}</p>
+                )}
+                {currentTask.websiteType && (
+                  <p><strong>Website Type:</strong> {currentTask.websiteType}</p>
+                )}
               </div>
             )}
           </div>
@@ -740,6 +949,58 @@ const TasksTable = ({ isAdmin, employeeId }: TasksTableProps) => {
               onClick={handleDeleteTask}
             >
               Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Features Dialog */}
+      <Dialog open={isFeaturesDialogOpen} onOpenChange={setIsFeaturesDialogOpen}>
+        <DialogContent className="bg-gray-800 text-white border-gray-700">
+          <DialogHeader>
+            <DialogTitle>Selected Features</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            {currentTask && (
+              <div>
+                <p className="mb-4">
+                  <strong>Website Type:</strong> {currentTask.websiteType || 'Not specified'}
+                </p>
+                <p className="mb-4">
+                  <strong>Complexity Level:</strong> {currentTask.complexity || 'Not specified'}
+                </p>
+                <p className="mb-4">
+                  <strong>Support Plan:</strong> {currentTask.supportPlan || 'Not specified'}
+                </p>
+                <div className="mt-4">
+                  <h3 className="font-semibold mb-2">Features:</h3>
+                  {currentTask.features ? (
+                    currentFeatures.length > 0 ? (
+                      <ul className="list-disc pl-5 space-y-1">
+                        {currentFeatures.map((feature, index) => (
+                          <li key={index} className="text-gray-200">{feature}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-gray-400">Features data present but couldn't be parsed: {currentTask.features}</p>
+                    )
+                  ) : (
+                    <p className="text-gray-400">No features data available for this task</p>
+                  )}
+                </div>
+                <div className="mt-4 p-4 bg-gray-700 rounded-md">
+                  <p><strong>Estimated Budget:</strong> ₹{currentTask.budget?.toLocaleString() || '0'}</p>
+                  <p><strong>Estimated Timeline:</strong> {currentTask.estimatedTimeline || '0'} days</p>
+                  {currentTask.estimatedDeliveryDate && (
+                    <p><strong>Estimated Delivery:</strong> {currentTask.estimatedDeliveryDate}</p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setIsFeaturesDialogOpen(false)}>
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>

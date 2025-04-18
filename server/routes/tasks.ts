@@ -23,9 +23,65 @@ router.get('/', authenticate, async (req: Request, res: Response) => {
       log('Admin fetching all tasks', 'tasks');
     }
     
+    // Log the query to verify it's correct
+    log(`Task query: ${JSON.stringify(query)}`, 'tasks');
+    
+    // Make sure to return all fields including budget calculator details
     const tasks = await Task.find(query)
       .populate('assignedTo', 'name email')
       .sort({ createdAt: -1 });
+    
+    // Log a sample task to verify fields are being returned
+    if (tasks.length > 0) {
+      // Check if the first task has the budget calculator fields
+      const sampleTask = tasks[0].toObject();
+      
+      log(`Sample task data: ${JSON.stringify({
+        id: sampleTask._id,
+        websiteType: sampleTask.websiteType,
+        complexity: sampleTask.complexity,
+        features: sampleTask.features ? 'present' : 'missing',
+        supportPlan: sampleTask.supportPlan
+      })}`, 'tasks');
+      
+      // If budget calculator fields are missing, try to update them from projectSummary
+      if (!sampleTask.websiteType && sampleTask.projectSummary) {
+        log(`Attempting to extract budget calculator data from projectSummary`, 'tasks');
+        try {
+          const projectSummary = JSON.parse(sampleTask.projectSummary);
+          
+          // Update tasks with missing budget calculator fields
+          for (const task of tasks) {
+            if (!task.websiteType && task.projectSummary) {
+              try {
+                const summary = JSON.parse(task.projectSummary);
+                task.websiteType = summary.websiteType || '';
+                task.complexity = summary.complexity || '';
+                task.features = JSON.stringify(summary.features || []);
+                task.supportPlan = summary.supportPlan || '';
+                
+                // Also update the database
+                await Task.updateOne(
+                  { _id: task._id },
+                  { 
+                    websiteType: task.websiteType,
+                    complexity: task.complexity,
+                    features: task.features,
+                    supportPlan: task.supportPlan
+                  }
+                );
+              } catch (e) {
+                log(`Error parsing projectSummary for task ${task._id}: ${e}`, 'tasks');
+              }
+            }
+          }
+          
+          log(`Updated tasks with budget calculator data from projectSummary`, 'tasks');
+        } catch (e) {
+          log(`Error parsing projectSummary: ${e}`, 'tasks');
+        }
+      }
+    }
     
     log(`Returned ${tasks.length} tasks`, 'tasks');
     res.status(200).json(tasks);
@@ -48,7 +104,10 @@ router.post('/', authenticate, async (req: Request, res: Response) => {
       expenses,
       status,
       assignedTo,
-      referredBy
+      referredBy,
+      projectSummary,
+      estimatedTimeline,
+      estimatedDeliveryDate
     } = req.body;
     
     // Set the referredBy field based on who is creating the task
@@ -75,7 +134,10 @@ router.post('/', authenticate, async (req: Request, res: Response) => {
       expenses: parseFloat(expenses) || 0,
       status: status || TaskStatus.RECEIVED,
       assignedTo: assignedTo || null,
-      referredBy: taskReferredBy
+      referredBy: taskReferredBy,
+      projectSummary: projectSummary || '',
+      estimatedTimeline: parseInt(estimatedTimeline) || 0,
+      estimatedDeliveryDate: estimatedDeliveryDate || ''
     });
     
     await task.save();
@@ -128,7 +190,10 @@ router.put('/:id', authenticate, async (req: Request, res: Response) => {
         budget,
         expenses,
         status,
-        assignedTo
+        assignedTo,
+        projectSummary,
+        estimatedTimeline,
+        estimatedDeliveryDate
       } = req.body;
       
       log(`Admin ${req.user.name} updating task details`, 'tasks');
@@ -142,6 +207,9 @@ router.put('/:id', authenticate, async (req: Request, res: Response) => {
       if (expenses !== undefined) task.expenses = parseFloat(expenses);
       if (status) task.status = status;
       if (assignedTo !== undefined) task.assignedTo = assignedTo || null;
+      if (projectSummary !== undefined) task.projectSummary = projectSummary;
+      if (estimatedTimeline !== undefined) task.estimatedTimeline = parseInt(estimatedTimeline);
+      if (estimatedDeliveryDate !== undefined) task.estimatedDeliveryDate = estimatedDeliveryDate;
     }
     
     await task.save();
