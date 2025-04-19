@@ -11,10 +11,20 @@ router.get('/', authenticate, async (req: Request, res: Response) => {
     const { assignedTo } = req.query;
     let query = {};
     
-    // If assignedTo is provided, filter by it
-    if (assignedTo) {
-      query = { assignedTo };
-      log(`Fetching tasks for employee: ${assignedTo}`, 'tasks');
+    // If assignedTo is provided and is a valid ObjectId, filter by it
+    if (assignedTo && assignedTo !== 'undefined') {
+      // Log the assignedTo value for debugging
+      log(`Received assignedTo parameter: ${assignedTo}`, 'tasks');
+      
+      // Check if it's a valid MongoDB ObjectId
+      if (/^[0-9a-fA-F]{24}$/.test(assignedTo as string)) {
+        query = { assignedTo };
+        log(`Fetching tasks for employee: ${assignedTo}`, 'tasks');
+      } else {
+        log(`Invalid ObjectId format for assignedTo: ${assignedTo}`, 'tasks');
+        // If not a valid ObjectId, return empty result
+        return res.status(200).json([]);
+      }
     } else if (req.user.role !== 'admin') {
       // If not admin, only show tasks assigned to the user
       query = { assignedTo: req.user._id };
@@ -23,62 +33,45 @@ router.get('/', authenticate, async (req: Request, res: Response) => {
       log('Admin fetching all tasks', 'tasks');
     }
     
-    // Log the query to verify it's correct
-    log(`Task query: ${JSON.stringify(query)}`, 'tasks');
-    
     // Make sure to return all fields including budget calculator details
     const tasks = await Task.find(query)
       .populate('assignedTo', 'name email')
       .sort({ createdAt: -1 });
     
-    // Log a sample task to verify fields are being returned
+    // If budget calculator fields are missing, try to update them from projectSummary
     if (tasks.length > 0) {
-      // Check if the first task has the budget calculator fields
-      const sampleTask = tasks[0].toObject();
-      
-      log(`Sample task data: ${JSON.stringify({
-        id: sampleTask._id,
-        websiteType: sampleTask.websiteType,
-        complexity: sampleTask.complexity,
-        features: sampleTask.features ? 'present' : 'missing',
-        supportPlan: sampleTask.supportPlan
-      })}`, 'tasks');
-      
-      // If budget calculator fields are missing, try to update them from projectSummary
-      if (!sampleTask.websiteType && sampleTask.projectSummary) {
-        log(`Attempting to extract budget calculator data from projectSummary`, 'tasks');
-        try {
-          const projectSummary = JSON.parse(sampleTask.projectSummary);
-          
-          // Update tasks with missing budget calculator fields
-          for (const task of tasks) {
-            if (!task.websiteType && task.projectSummary) {
-              try {
-                const summary = JSON.parse(task.projectSummary);
-                task.websiteType = summary.websiteType || '';
-                task.complexity = summary.complexity || '';
-                task.features = JSON.stringify(summary.features || []);
-                task.supportPlan = summary.supportPlan || '';
-                
-                // Also update the database
-                await Task.updateOne(
-                  { _id: task._id },
-                  { 
-                    websiteType: task.websiteType,
-                    complexity: task.complexity,
-                    features: task.features,
-                    supportPlan: task.supportPlan
-                  }
-                );
-              } catch (e) {
-                log(`Error parsing projectSummary for task ${task._id}: ${e}`, 'tasks');
-              }
+      for (const task of tasks) {
+        if ((!task.websiteType || !task.complexity || !task.features || !task.supportPlan) && task.projectSummary) {
+          try {
+            const summary = JSON.parse(task.projectSummary);
+            
+            // Update task with data from projectSummary
+            if (!task.websiteType && summary.websiteType) {
+              task.websiteType = summary.websiteType;
             }
+            if (!task.complexity && summary.complexity) {
+              task.complexity = summary.complexity;
+            }
+            if (!task.features && summary.features) {
+              task.features = JSON.stringify(summary.features);
+            }
+            if (!task.supportPlan && summary.supportPlan) {
+              task.supportPlan = summary.supportPlan;
+            }
+            
+            // Also update the database
+            await Task.updateOne(
+              { _id: task._id },
+              { 
+                websiteType: task.websiteType,
+                complexity: task.complexity,
+                features: task.features,
+                supportPlan: task.supportPlan
+              }
+            );
+          } catch (e) {
+            // Silently handle parsing errors
           }
-          
-          log(`Updated tasks with budget calculator data from projectSummary`, 'tasks');
-        } catch (e) {
-          log(`Error parsing projectSummary: ${e}`, 'tasks');
         }
       }
     }
@@ -107,7 +100,11 @@ router.post('/', authenticate, async (req: Request, res: Response) => {
       referredBy,
       projectSummary,
       estimatedTimeline,
-      estimatedDeliveryDate
+      estimatedDeliveryDate,
+      websiteType,
+      complexity,
+      features,
+      supportPlan
     } = req.body;
     
     // Set the referredBy field based on who is creating the task
@@ -124,6 +121,25 @@ router.post('/', authenticate, async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Required fields missing' });
     }
     
+    // Handle the assignedTo field properly
+    let taskAssignedTo = null;
+    
+    // If assignedTo is provided and not "unassigned"
+    if (assignedTo && assignedTo !== 'unassigned' && assignedTo !== 'undefined') {
+      // Check if it's a valid MongoDB ObjectId
+      if (/^[0-9a-fA-F]{24}$/.test(assignedTo)) {
+        taskAssignedTo = assignedTo;
+      } else {
+        log(`Invalid ObjectId format for assignedTo: ${assignedTo}`, 'tasks');
+      }
+    } else if (req.user.role === 'employee') {
+      // If employee is creating the task, assign it to themselves
+      taskAssignedTo = req.user._id;
+      log(`Employee ${req.user.name} assigning task to themselves`, 'tasks');
+    }
+    
+    log(`Setting assignedTo to: ${taskAssignedTo}`, 'tasks');
+    
     const task = new Task({
       customerName,
       customerEmail,
@@ -133,17 +149,25 @@ router.post('/', authenticate, async (req: Request, res: Response) => {
       budget: parseFloat(budget) || 0,
       expenses: parseFloat(expenses) || 0,
       status: status || TaskStatus.RECEIVED,
-      assignedTo: assignedTo || null,
+      assignedTo: taskAssignedTo,
       referredBy: taskReferredBy,
       projectSummary: projectSummary || '',
       estimatedTimeline: parseInt(estimatedTimeline) || 0,
-      estimatedDeliveryDate: estimatedDeliveryDate || ''
+      estimatedDeliveryDate: estimatedDeliveryDate || '',
+      websiteType: websiteType || '',
+      complexity: complexity || '',
+      features: features || '',
+      supportPlan: supportPlan || ''
     });
     
     await task.save();
     log(`Task created with ID: ${task._id}, referred by: ${taskReferredBy}`, 'tasks');
     
-    res.status(201).json(task);
+    // Populate the assignedTo field before returning the task
+    const populatedTask = await Task.findById(task._id).populate('assignedTo', 'name email');
+    log(`Task assigned to: ${populatedTask.assignedTo ? populatedTask.assignedTo.name : 'Unassigned'}`, 'tasks');
+    
+    res.status(201).json(populatedTask);
   } catch (error) {
     log(`Error creating task: ${error}`, 'tasks');
     res.status(500).json({ message: 'Server error' });
@@ -171,14 +195,29 @@ router.put('/:id', authenticate, async (req: Request, res: Response) => {
         return res.status(403).json({ message: 'Access denied' });
       }
       
-      // Only allow status updates for employees
-      if (Object.keys(req.body).length > 1 || !req.body.status) {
-        log(`Invalid update: Employee tried to update more than status`, 'tasks');
-        return res.status(403).json({ message: 'You can only update the status' });
+      // Allow employees to update status, website type, complexity, features, support plan, and estimated delivery date
+      const allowedFields = ['status', 'websiteType', 'complexity', 'features', 'supportPlan', 'estimatedDeliveryDate'];
+      const requestedFields = Object.keys(req.body);
+      
+      // Check if employee is trying to update fields they're not allowed to
+      const hasInvalidFields = requestedFields.some(field => !allowedFields.includes(field));
+      
+      if (hasInvalidFields) {
+        log(`Invalid update: Employee tried to update restricted fields`, 'tasks');
+        return res.status(403).json({ 
+          message: 'You can only update the status, website type, complexity, features, support plan, and estimated delivery date' 
+        });
       }
       
-      log(`Employee ${req.user.name} updating task status to: ${req.body.status}`, 'tasks');
-      task.status = req.body.status;
+      log(`Employee ${req.user.name} updating task`, 'tasks');
+      
+      // Update allowed fields
+      if (req.body.status) task.status = req.body.status;
+      if (req.body.websiteType !== undefined) task.websiteType = req.body.websiteType;
+      if (req.body.complexity !== undefined) task.complexity = req.body.complexity;
+      if (req.body.features !== undefined) task.features = req.body.features;
+      if (req.body.supportPlan !== undefined) task.supportPlan = req.body.supportPlan;
+      if (req.body.estimatedDeliveryDate !== undefined) task.estimatedDeliveryDate = req.body.estimatedDeliveryDate;
     } else {
       // Admin can update all fields
       const {
@@ -222,17 +261,28 @@ router.put('/:id', authenticate, async (req: Request, res: Response) => {
   }
 });
 
-// Delete a task (admin only)
-router.delete('/:id', authenticate, authorizeAdmin, async (req: Request, res: Response) => {
+// Delete a task (admin or assigned employee)
+router.delete('/:id', authenticate, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    log(`Admin ${req.user.name} attempting to delete task ${id}`, 'tasks');
     
     const task = await Task.findById(id);
     
     if (!task) {
       log(`Task not found: ${id}`, 'tasks');
       return res.status(404).json({ message: 'Task not found' });
+    }
+    
+    // Check permissions
+    if (req.user.role !== 'admin') {
+      // Employees can only delete tasks assigned to them
+      if (!task.assignedTo || task.assignedTo.toString() !== req.user._id.toString()) {
+        log(`Access denied: Employee ${req.user.name} tried to delete task not assigned to them`, 'tasks');
+        return res.status(403).json({ message: 'Access denied' });
+      }
+      log(`Employee ${req.user.name} deleting their assigned task ${id}`, 'tasks');
+    } else {
+      log(`Admin ${req.user.name} deleting task ${id}`, 'tasks');
     }
     
     await task.deleteOne();

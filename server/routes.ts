@@ -141,8 +141,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
         
-        // Simple assignment - first employee in the list
-        const assignedEmployee = employees[0];
+        // Find the employee with the fewest assigned calls for better distribution
+        let assignedEmployee = employees[0];
+        
+        try {
+          // Count calls for each employee
+          const employeeCallCounts = await Promise.all(
+            employees.map(async (employee) => {
+              const count = await CallSchedule.countDocuments({ assignedTo: employee._id });
+              return { employee, count };
+            })
+          );
+          
+          // Sort by count (ascending) and get the employee with the fewest calls
+          const sortedEmployees = employeeCallCounts.sort((a, b) => a.count - b.count);
+          assignedEmployee = sortedEmployees[0].employee;
+          
+          log(`Assigned call to ${assignedEmployee.name} who has ${sortedEmployees[0].count} calls`, 'call-schedule');
+        } catch (err) {
+          log(`Error finding employee with fewest calls, using default: ${err}`, 'call-schedule');
+          // Fall back to first employee if there's an error
+        }
         
         // Create call schedule
         const callSchedule = new CallSchedule({
@@ -158,20 +177,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await callSchedule.save();
         log(`Call scheduled with ID: ${callSchedule._id}, assigned to: ${assignedEmployee.name}`, 'call-schedule');
         
-        // Also create a task for this customer
-        const task = new Task({
-          customerName,
-          customerEmail,
-          customerCompany: '',
-          serviceRequired: 'Call Requested',
-          projectDetails: message || `Customer requested a call on ${new Date(scheduledTime).toLocaleString()} (${timeZone})`,
-          budget: 0,
-          status: TaskStatus.RECEIVED,
-          referredBy: 'web'
-        });
-        
-        await task.save();
-        log(`Task created from call schedule with ID: ${task._id}`, 'call-schedule');
+        // We're no longer creating a task for call schedules
+        // This ensures call schedules only appear in the Call Schedules tab
+        log(`Call schedule created successfully without creating a task`, 'call-schedule');
         
         res.status(200).json({ 
           success: true, 

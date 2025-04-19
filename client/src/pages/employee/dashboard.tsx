@@ -23,7 +23,23 @@ const EmployeeDashboard = () => {
       return;
     }
 
-    setUser(JSON.parse(storedUser));
+    try {
+      const parsedUser = JSON.parse(storedUser);
+      console.log('User from localStorage:', parsedUser);
+      console.log('User ID:', parsedUser.id);
+      console.log('User role:', parsedUser.role);
+      setUser(parsedUser);
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      toast({
+        title: 'Error',
+        description: 'Invalid user data. Please log in again.',
+        variant: 'destructive',
+      });
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setLocation('/login');
+    }
   }, [setLocation, toast]);
 
   if (!user) {
@@ -56,66 +72,17 @@ const EmployeeDashboard = () => {
           </TabsList>
           
           <TabsContent value="tasks">
-            <div className="mb-4 p-4 bg-blue-900/30 border border-blue-700 rounded-md flex justify-between items-center">
-              <p className="text-blue-300">Debug Info: Employee ID: {user._id}</p>
-              <button 
-                className="px-3 py-1 bg-blue-700 text-white rounded-md hover:bg-blue-600"
-                onClick={async () => {
-                  try {
-                    const token = localStorage.getItem('token');
-                    const response = await fetch(`/api/tasks?assignedTo=${user._id}`, {
-                      headers: {
-                        'Authorization': `Bearer ${token}`
-                      }
-                    });
-                    
-                    if (!response.ok) {
-                      throw new Error('Failed to fetch tasks');
-                    }
-                    
-                    const data = await response.json();
-                    console.log('Debug - Fetched tasks:', data);
-                    
-                    if (data.length > 0) {
-                      console.log('Debug - First task details:', {
-                        id: data[0]._id,
-                        websiteType: data[0].websiteType,
-                        complexity: data[0].complexity,
-                        features: data[0].features,
-                        supportPlan: data[0].supportPlan
-                      });
-                      
-                      toast({
-                        title: 'Task Debug Info',
-                        description: `Found ${data.length} tasks. First task has websiteType: ${data[0].websiteType || 'N/A'}, complexity: ${data[0].complexity || 'N/A'}`,
-                      });
-                    } else {
-                      toast({
-                        title: 'Task Debug Info',
-                        description: 'No tasks found',
-                      });
-                    }
-                  } catch (error: any) {
-                    toast({
-                      title: 'Error',
-                      description: error.message,
-                      variant: 'destructive',
-                    });
-                  }
-                }}
-              >
-                Debug Tasks
-              </button>
-            </div>
-            <TasksTable isAdmin={false} employeeId={user._id} />
+            {/* Don't pass employeeId - let the server use the authenticated user */}
+            <TasksTable isAdmin={false} />
           </TabsContent>
           
           <TabsContent value="calls">
-            <CallScheduleTable isAdmin={false} employeeId={user._id} />
+            {/* Don't pass employeeId - let the server use the authenticated user */}
+            <CallScheduleTable isAdmin={false} />
           </TabsContent>
           
           <TabsContent value="profile">
-            <EmployeeProfile employeeId={user._id} />
+            <EmployeeProfile />
           </TabsContent>
         </Tabs>
       </main>

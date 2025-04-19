@@ -11,31 +11,46 @@ import { useToast } from '@/hooks/use-toast';
 import { User, Mail, Briefcase, DollarSign } from 'lucide-react';
 
 interface EmployeeProfileProps {
-  employeeId: string;
+  // No props needed as we're using the /api/users/me endpoint
 }
 
-const EmployeeProfile = ({ employeeId }: EmployeeProfileProps) => {
+const EmployeeProfile = () => {
   const [employeeDetails, setEmployeeDetails] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   const fetchEmployeeDetails = async () => {
     try {
+      console.log('Fetching employee details');
+      
       const token = localStorage.getItem('token');
-      // Use the /api/users/me endpoint instead of /api/employees/:id
-      const response = await fetch(`/api/users/me`, {
+      const user = localStorage.getItem('user');
+      
+      if (!user) {
+        throw new Error('User information not found');
+      }
+      
+      const userData = JSON.parse(user);
+      const userId = userData.id || userData._id;
+      
+      // Use the /api/auth/users/me endpoint which is the correct endpoint
+      const response = await fetch(`/api/auth/users/me`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
       
       if (!response.ok) {
-        throw new Error('Failed to fetch employee details');
+        const errorText = await response.text();
+        console.error('Failed to fetch employee details:', errorText);
+        throw new Error(`Failed to fetch employee details: ${response.status} ${errorText}`);
       }
       
       const data = await response.json();
+      console.log('Employee details fetched:', data);
       setEmployeeDetails(data);
     } catch (error: any) {
+      console.error('Error fetching employee details:', error);
       toast({
         title: 'Error',
         description: error.message,
@@ -48,7 +63,7 @@ const EmployeeProfile = ({ employeeId }: EmployeeProfileProps) => {
 
   useEffect(() => {
     fetchEmployeeDetails();
-  }, [employeeId]);
+  }, []);
 
   if (loading) {
     return (
@@ -58,10 +73,26 @@ const EmployeeProfile = ({ employeeId }: EmployeeProfileProps) => {
     );
   }
 
-  if (!employeeDetails) {
+  if (!employeeDetails || !employeeDetails.employee || !employeeDetails.payoutDetails) {
     return (
       <div className="bg-gray-800 rounded-lg p-8 text-center">
-        <p className="text-gray-400">Could not load employee details</p>
+        <p className="text-gray-400 text-lg font-semibold mb-4">Could not load employee details</p>
+        
+        {employeeDetails && (
+          <div className="mt-4 p-4 bg-gray-700 rounded-md text-left overflow-auto max-h-60">
+            <p className="text-white mb-2 font-semibold">Received data:</p>
+            <pre className="text-red-400 text-sm">
+              {JSON.stringify(employeeDetails, null, 2)}
+            </pre>
+          </div>
+        )}
+        
+        <button 
+          onClick={fetchEmployeeDetails} 
+          className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md"
+        >
+          Try Again
+        </button>
       </div>
     );
   }

@@ -50,9 +50,14 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
   const fetchCallSchedules = async () => {
     try {
       const token = localStorage.getItem('token');
-      const url = employeeId 
-        ? `/api/call-schedules?assignedTo=${employeeId}` 
+      
+      // For employee dashboard, don't pass the employeeId parameter
+      // The server will use the authenticated user's ID
+      const url = isAdmin 
+        ? '/api/call-schedules' 
         : '/api/call-schedules';
+      
+      console.log('Fetching call schedules from URL:', url);
       
       const response = await fetch(url, {
         headers: {
@@ -61,12 +66,16 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
       });
       
       if (!response.ok) {
-        throw new Error('Failed to fetch call schedules');
+        const errorText = await response.text();
+        console.error('Failed to fetch call schedules:', errorText);
+        throw new Error(`Failed to fetch call schedules: ${response.status} ${errorText}`);
       }
       
       const data = await response.json();
+      console.log('Call schedules fetched:', data);
       setCallSchedules(data);
     } catch (error: any) {
+      console.error('Error fetching call schedules:', error);
       toast({
         title: 'Error',
         description: error.message,
@@ -103,9 +112,34 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
     }
   };
 
+  // Get current user info
+  const getCurrentUserInfo = () => {
+    try {
+      const userString = localStorage.getItem('user');
+      if (userString) {
+        return JSON.parse(userString);
+      }
+      return null;
+    } catch (error) {
+      console.error('Error parsing user info:', error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     fetchCallSchedules();
     fetchEmployees();
+    
+    // If employee, set the assignedTo field to the current user's ID
+    if (!isAdmin) {
+      const currentUser = getCurrentUserInfo();
+      if (currentUser && currentUser._id) {
+        setFormData(prev => ({
+          ...prev,
+          assignedTo: currentUser._id
+        }));
+      }
+    }
   }, [isAdmin, employeeId]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -124,15 +158,29 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
   };
 
   const resetForm = () => {
-    setFormData({
-      customerName: '',
-      customerEmail: '',
-      timeZone: '',
-      scheduledTime: '',
-      assignedTo: '',
-      status: 'scheduled',
-      notes: ''
-    });
+    // If employee, keep the assignedTo field set to their ID
+    if (!isAdmin) {
+      const currentUser = getCurrentUserInfo();
+      setFormData({
+        customerName: '',
+        customerEmail: '',
+        timeZone: '',
+        scheduledTime: '',
+        assignedTo: currentUser?._id || '',
+        status: 'scheduled',
+        notes: ''
+      });
+    } else {
+      setFormData({
+        customerName: '',
+        customerEmail: '',
+        timeZone: '',
+        scheduledTime: '',
+        assignedTo: '',
+        status: 'scheduled',
+        notes: ''
+      });
+    }
   };
 
   const handleAddCallSchedule = async () => {
@@ -173,13 +221,25 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
     
     try {
       const token = localStorage.getItem('token');
+      
+      // If employee, ensure they can't change the assignedTo field
+      let dataToSend = { ...formData };
+      
+      if (!isAdmin) {
+        // For employees, keep the original assignedTo value
+        const currentUser = getCurrentUserInfo();
+        if (currentUser && currentUser._id) {
+          dataToSend.assignedTo = currentUser._id;
+        }
+      }
+      
       const response = await fetch(`/api/call-schedules/${currentCall._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(dataToSend)
       });
       
       if (!response.ok) {
@@ -238,15 +298,35 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
 
   const openEditDialog = (call: any) => {
     setCurrentCall(call);
-    setFormData({
-      customerName: call.customerName,
-      customerEmail: call.customerEmail,
-      timeZone: call.timeZone,
-      scheduledTime: new Date(call.scheduledTime).toISOString().slice(0, 16),
-      assignedTo: call.assignedTo?._id || '',
-      status: call.status,
-      notes: call.notes || ''
-    });
+    
+    // If employee, ensure they can only edit their own assigned calls
+    // and the assignedTo field is set to their ID
+    if (!isAdmin) {
+      const currentUser = getCurrentUserInfo();
+      if (currentUser && currentUser._id) {
+        setFormData({
+          customerName: call.customerName,
+          customerEmail: call.customerEmail,
+          timeZone: call.timeZone,
+          scheduledTime: new Date(call.scheduledTime).toISOString().slice(0, 16),
+          assignedTo: currentUser._id, // Always set to current employee's ID
+          status: call.status,
+          notes: call.notes || ''
+        });
+      }
+    } else {
+      // Admin can edit any call and change the assignedTo field
+      setFormData({
+        customerName: call.customerName,
+        customerEmail: call.customerEmail,
+        timeZone: call.timeZone,
+        scheduledTime: new Date(call.scheduledTime).toISOString().slice(0, 16),
+        assignedTo: call.assignedTo?._id || '',
+        status: call.status,
+        notes: call.notes || ''
+      });
+    }
+    
     setIsEditDialogOpen(true);
   };
 
@@ -351,48 +431,59 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
                         </Button>
                       </div>
                     ) : (
-                      <Select
-                        value={call.status}
-                        onValueChange={(value) => {
-                          // Update call status
-                          const token = localStorage.getItem('token');
-                          fetch(`/api/call-schedules/${call._id}`, {
-                            method: 'PUT',
-                            headers: {
-                              'Content-Type': 'application/json',
-                              'Authorization': `Bearer ${token}`
-                            },
-                            body: JSON.stringify({ status: value })
-                          })
-                            .then(response => {
-                              if (!response.ok) throw new Error('Failed to update status');
-                              return response.json();
+                      <div className="flex space-x-2">
+                        <Select
+                          value={call.status}
+                          onValueChange={(value) => {
+                            // Update call status
+                            const token = localStorage.getItem('token');
+                            fetch(`/api/call-schedules/${call._id}`, {
+                              method: 'PUT',
+                              headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                              },
+                              body: JSON.stringify({ status: value })
                             })
-                            .then(() => {
-                              toast({
-                                title: 'Status Updated',
-                                description: 'Call status has been updated successfully',
+                              .then(response => {
+                                if (!response.ok) throw new Error('Failed to update status');
+                                return response.json();
+                              })
+                              .then(() => {
+                                toast({
+                                  title: 'Status Updated',
+                                  description: 'Call status has been updated successfully',
+                                });
+                                fetchCallSchedules();
+                              })
+                              .catch(error => {
+                                toast({
+                                  title: 'Error',
+                                  description: error.message,
+                                  variant: 'destructive',
+                                });
                               });
-                              fetchCallSchedules();
-                            })
-                            .catch(error => {
-                              toast({
-                                title: 'Error',
-                                description: error.message,
-                                variant: 'destructive',
-                              });
-                            });
-                        }}
-                      >
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="scheduled">Scheduled</SelectItem>
-                          <SelectItem value="spoken">Spoken</SelectItem>
-                          <SelectItem value="not_spoken">Not Spoken</SelectItem>
-                        </SelectContent>
-                      </Select>
+                          }}
+                        >
+                          <SelectTrigger className="w-[140px]">
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="scheduled">Scheduled</SelectItem>
+                            <SelectItem value="spoken">Spoken</SelectItem>
+                            <SelectItem value="not_spoken">Not Spoken</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-red-500 border-red-500 hover:bg-red-950"
+                          onClick={() => openDeleteDialog(call)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     )}
                   </TableCell>
                 </TableRow>
@@ -459,21 +550,40 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label htmlFor="assignedTo">Assign To</label>
-                <Select
-                  value={formData.assignedTo}
-                  onValueChange={(value) => handleSelectChange('assignedTo', value)}
-                >
-                  <SelectTrigger className="bg-gray-700 border-gray-600">
-                    <SelectValue placeholder="Select employee" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {employees.map((employee) => (
-                      <SelectItem key={employee._id} value={employee._id}>
-                        {employee.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {isAdmin ? (
+                  <Select
+                    value={formData.assignedTo}
+                    onValueChange={(value) => handleSelectChange('assignedTo', value)}
+                  >
+                    <SelectTrigger className="bg-gray-700 border-gray-600">
+                      <SelectValue placeholder="Select employee" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {employees.map((employee) => (
+                        <SelectItem key={employee._id} value={employee._id}>
+                          {employee.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <div className="relative">
+                    <Input
+                      id="assignedTo"
+                      value={getCurrentUserInfo()?.name || 'Current Employee'}
+                      readOnly
+                      className="bg-gray-700 border-gray-600 cursor-not-allowed opacity-70"
+                    />
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                      </svg>
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="space-y-2">
                 <label htmlFor="status">Status</label>
@@ -569,21 +679,40 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label htmlFor="edit-assignedTo">Assign To</label>
-                <Select
-                  value={formData.assignedTo}
-                  onValueChange={(value) => handleSelectChange('assignedTo', value)}
-                >
-                  <SelectTrigger className="bg-gray-700 border-gray-600">
-                    <SelectValue placeholder="Select employee" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {employees.map((employee) => (
-                      <SelectItem key={employee._id} value={employee._id}>
-                        {employee.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {isAdmin ? (
+                  <Select
+                    value={formData.assignedTo}
+                    onValueChange={(value) => handleSelectChange('assignedTo', value)}
+                  >
+                    <SelectTrigger className="bg-gray-700 border-gray-600">
+                      <SelectValue placeholder="Select employee" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {employees.map((employee) => (
+                        <SelectItem key={employee._id} value={employee._id}>
+                          {employee.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <div className="relative">
+                    <Input
+                      id="edit-assignedTo"
+                      value={getCurrentUserInfo()?.name || 'Current Employee'}
+                      readOnly
+                      className="bg-gray-700 border-gray-600 cursor-not-allowed opacity-70"
+                    />
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                      </svg>
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="space-y-2">
                 <label htmlFor="edit-status">Status</label>
