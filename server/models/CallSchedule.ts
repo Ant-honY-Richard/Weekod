@@ -3,6 +3,8 @@ import mongoose, { Document, Schema } from 'mongoose';
 export enum CallStatus {
   SCHEDULED = 'scheduled',
   SPOKEN = 'spoken',
+  SPOKEN_INTERESTED = 'spoken_interested',
+  SPOKEN_NOT_INTERESTED = 'spoken_not_interested',
   NOT_SPOKEN = 'not_spoken'
 }
 

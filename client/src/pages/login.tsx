@@ -172,9 +172,7 @@ const Login = () => {
 
           <div className="px-8 py-6 bg-gray-900 border-t border-gray-700">
             <p className="text-center text-gray-400 text-sm">
-              Demo Accounts:<br />
-              Admin: anthony@weekod.com / anthony@123<br />
-              Employee: margreat@weekod.com / margreat@123
+              © 2024 Weekod. All rights reserved.
             </p>
           </div>
         </motion.div>

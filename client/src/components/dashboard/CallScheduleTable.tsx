@@ -17,7 +17,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Edit, Trash2, Plus, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -222,15 +222,19 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
     try {
       const token = localStorage.getItem('token');
       
-      // If employee, ensure they can't change the assignedTo field
-      let dataToSend = { ...formData };
+      // Prepare data to send based on user role
+      let dataToSend;
       
       if (!isAdmin) {
-        // For employees, keep the original assignedTo value
-        const currentUser = getCurrentUserInfo();
-        if (currentUser && currentUser._id) {
-          dataToSend.assignedTo = currentUser._id;
-        }
+        // For employees, only send status and notes (server restriction)
+        dataToSend = {
+          status: formData.status,
+          notes: formData.notes
+        };
+        console.log('Employee updating call schedule with data:', dataToSend);
+      } else {
+        // Admin can update all fields
+        dataToSend = { ...formData };
       }
       
       const response = await fetch(`/api/call-schedules/${currentCall._id}`, {
@@ -341,6 +345,10 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
         return <Badge className="bg-blue-500">Scheduled</Badge>;
       case 'spoken':
         return <Badge className="bg-green-500">Spoken</Badge>;
+      case 'spoken_interested':
+        return <Badge className="bg-green-600">Spoken - Interested</Badge>;
+      case 'spoken_not_interested':
+        return <Badge className="bg-yellow-500">Spoken - Not Interested</Badge>;
       case 'not_spoken':
         return <Badge className="bg-red-500">Not Spoken</Badge>;
       default:
@@ -432,6 +440,15 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
                       </div>
                     ) : (
                       <div className="flex space-x-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => openEditDialog(call)}
+                          className="bg-blue-600 hover:bg-blue-700 text-white border-none"
+                        >
+                          <Edit className="h-4 w-4 mr-1" />
+                          Edit
+                        </Button>
                         <Select
                           value={call.status}
                           onValueChange={(value) => {
@@ -465,12 +482,14 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
                               });
                           }}
                         >
-                          <SelectTrigger className="w-[140px]">
+                          <SelectTrigger className="w-[150px]">
                             <SelectValue placeholder="Select status" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="scheduled">Scheduled</SelectItem>
                             <SelectItem value="spoken">Spoken</SelectItem>
+                            <SelectItem value="spoken_interested" className="pl-6">→ Interested</SelectItem>
+                            <SelectItem value="spoken_not_interested" className="pl-6">→ Not Interested</SelectItem>
                             <SelectItem value="not_spoken">Not Spoken</SelectItem>
                           </SelectContent>
                         </Select>
@@ -597,6 +616,8 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
                   <SelectContent>
                     <SelectItem value="scheduled">Scheduled</SelectItem>
                     <SelectItem value="spoken">Spoken</SelectItem>
+                    <SelectItem value="spoken_interested" className="pl-6">→ Interested</SelectItem>
+                    <SelectItem value="spoken_not_interested" className="pl-6">→ Not Interested</SelectItem>
                     <SelectItem value="not_spoken">Not Spoken</SelectItem>
                   </SelectContent>
                 </Select>
@@ -726,6 +747,8 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
                   <SelectContent>
                     <SelectItem value="scheduled">Scheduled</SelectItem>
                     <SelectItem value="spoken">Spoken</SelectItem>
+                    <SelectItem value="spoken_interested" className="pl-6">→ Interested</SelectItem>
+                    <SelectItem value="spoken_not_interested" className="pl-6">→ Not Interested</SelectItem>
                     <SelectItem value="not_spoken">Not Spoken</SelectItem>
                   </SelectContent>
                 </Select>
