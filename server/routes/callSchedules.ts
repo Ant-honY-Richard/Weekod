@@ -51,7 +51,7 @@ router.post('/', authenticate, async (req: Request, res: Response) => {
     const {
       customerName,
       customerEmail,
-      timeZone,
+      phoneNumber,
       scheduledTime,
       assignedTo,
       status,
@@ -70,15 +70,21 @@ router.post('/', authenticate, async (req: Request, res: Response) => {
     }
     
     // Validate required fields
-    if (!customerName || !customerEmail || !timeZone || !scheduledTime) {
+    if (!customerName || !customerEmail || !phoneNumber || !scheduledTime) {
       log('Call schedule creation failed: Required fields missing', 'call-schedules');
       return res.status(400).json({ message: 'Required fields missing' });
+    }
+    
+    // Validate phone number is exactly 10 digits (Indian format)
+    if (!/^[0-9]{10}$/.test(phoneNumber)) {
+      log(`Call schedule creation failed: Invalid phone number format: ${phoneNumber}`, 'call-schedules');
+      return res.status(400).json({ message: 'Phone number must be exactly 10 digits' });
     }
     
     const callSchedule = new CallSchedule({
       customerName,
       customerEmail,
-      timeZone,
+      phoneNumber,
       scheduledTime: new Date(scheduledTime),
       assignedTo: finalAssignedTo,
       status: status || CallStatus.SCHEDULED,
@@ -134,7 +140,7 @@ router.put('/:id', authenticate, async (req: Request, res: Response) => {
       const {
         customerName,
         customerEmail,
-        timeZone,
+        phoneNumber,
         scheduledTime,
         assignedTo,
         status,
@@ -145,7 +151,7 @@ router.put('/:id', authenticate, async (req: Request, res: Response) => {
       
       if (customerName) callSchedule.customerName = customerName;
       if (customerEmail) callSchedule.customerEmail = customerEmail;
-      if (timeZone) callSchedule.timeZone = timeZone;
+      if (phoneNumber) callSchedule.phoneNumber = phoneNumber;
       if (scheduledTime) callSchedule.scheduledTime = new Date(scheduledTime);
       if (assignedTo !== undefined) callSchedule.assignedTo = assignedTo;
       if (status) callSchedule.status = status;

@@ -16,45 +16,7 @@ const TIME_SLOTS = [
   '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM'
 ];
 
-// Available timezones (simplified list)
-const TIMEZONES = [
-  { value: 'UTC-8', label: 'Pacific Time (PT)' },
-  { value: 'UTC-7', label: 'Mountain Time (MT)' },
-  { value: 'UTC-6', label: 'Central Time (CT)' },
-  { value: 'UTC-5', label: 'Eastern Time (ET)' },
-  { value: 'UTC+0', label: 'Greenwich Mean Time (GMT)' },
-  { value: 'UTC+1', label: 'Central European Time (CET)' },
-  { value: 'UTC+2', label: 'Eastern European Time (EET)' },
-  { value: 'UTC+5:30', label: 'Indian Standard Time (IST)' },
-  { value: 'UTC+8', label: 'China Standard Time (CST)' },
-  { value: 'UTC+9', label: 'Japan Standard Time (JST)' },
-  { value: 'UTC+10', label: 'Australian Eastern Time (AET)' }
-];
-
-// Detect user's timezone
-const getUserTimezone = () => {
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  // Map timezone to our simplified list (default to ET if not found)
-  const mapping: Record<string, string> = {
-    'America/Los_Angeles': 'UTC-8',
-    'America/Denver': 'UTC-7',
-    'America/Chicago': 'UTC-6',
-    'America/New_York': 'UTC-5',
-    'Europe/London': 'UTC+0',
-    'Europe/Paris': 'UTC+1',
-    'Europe/Athens': 'UTC+2',
-    'Asia/Kolkata': 'UTC+5:30',
-    'Asia/Shanghai': 'UTC+8',
-    'Asia/Tokyo': 'UTC+9',
-    'Australia/Sydney': 'UTC+10'
-  };
-  
-  // Try to find a match, otherwise default to Eastern Time
-  for (const [key, value] of Object.entries(mapping)) {
-    if (timezone.includes(key)) return value;
-  }
-  return 'UTC-5'; // Default to Eastern Time
-};
+// No timezone-related code needed anymore
 
 type Step = 'info' | 'date' | 'time' | 'confirmation' | 'success';
 
@@ -65,7 +27,7 @@ export function CallScheduler() {
   const [time, setTime] = useState<string | undefined>(undefined);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [timezone, setTimezone] = useState(getUserTimezone());
+  const [phoneNumber, setPhoneNumber] = useState('0000000000');
   const [isButtonGlowing, setIsButtonGlowing] = useState(true);
 
   // Toggle button glow effect
@@ -82,7 +44,7 @@ export function CallScheduler() {
     setTime(undefined);
     setName('');
     setEmail('');
-    setTimezone(getUserTimezone());
+    setPhoneNumber('');
   };
 
   const handleOpen = () => {
@@ -112,19 +74,34 @@ export function CallScheduler() {
         
         scheduledDateTime.setHours(hour, parseInt(minutes), 0);
         
+        // Log the data being sent
+        const requestData = {
+          customerName: name,
+          customerEmail: email,
+          phoneNumber: phoneNumber,
+          scheduledTime: scheduledDateTime.toISOString(),
+          message: `Call scheduled from website for ${name} (${email}), Phone: ${phoneNumber}`
+        };
+        
+        console.log('Sending call schedule data:', requestData);
+        
+        // Check if all required fields are present
+        if (!name || !email || !phoneNumber || !scheduledDateTime) {
+          console.error('Missing required fields:', {
+            name: !!name,
+            email: !!email,
+            phoneNumber: !!phoneNumber,
+            scheduledDateTime: !!scheduledDateTime
+          });
+        }
+        
         // Send the data to the backend
         const response = await fetch('/api/schedule-call', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            customerName: name,
-            customerEmail: email,
-            timeZone: timezone,
-            scheduledTime: scheduledDateTime.toISOString(),
-            message: `Call scheduled from website for ${name} (${email})`
-          }),
+          body: JSON.stringify(requestData),
         });
         
         if (!response.ok) {
@@ -152,7 +129,9 @@ export function CallScheduler() {
 
   const isNextDisabled = () => {
     if (step === 'info') {
-      return !name || !email || !email.includes('@');
+      // Validate phone number is exactly 10 digits
+      const isValidPhone = /^[0-9]{10}$/.test(phoneNumber);
+      return !name || !email || !email.includes('@') || !isValidPhone;
     } else if (step === 'date') {
       return !date;
     } else if (step === 'time') {
@@ -223,19 +202,28 @@ export function CallScheduler() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="timezone">Your Timezone</Label>
-                    <Select value={timezone} onValueChange={setTimezone}>
-                      <SelectTrigger className="bg-gray-800 border-gray-700 focus:ring-purple-500">
-                        <SelectValue placeholder="Select timezone" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-gray-800 border-gray-700">
-                        {TIMEZONES.map((tz) => (
-                          <SelectItem key={tz.value} value={tz.value}>
-                            {tz.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Label htmlFor="phoneNumber">Phone Number (10 digits)</Label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <span className="text-gray-400">+91</span>
+                      </div>
+                      <Input
+                        id="phoneNumber"
+                        type="tel"
+                        value={phoneNumber}
+                        onChange={(e) => {
+                          // Only allow digits and limit to 10 characters
+                          const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                          setPhoneNumber(value);
+                        }}
+                        placeholder="9876543210"
+                        className="bg-gray-800 border-gray-700 focus-visible:ring-purple-500 pl-12"
+                        required
+                        maxLength={10}
+                        pattern="[0-9]{10}"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500">Enter a 10-digit Indian mobile number</p>
                   </div>
                 </div>
               )}
@@ -313,7 +301,11 @@ export function CallScheduler() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-400">Time:</span>
-                      <span className="font-medium">{time} ({timezone})</span>
+                      <span className="font-medium">{time}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Phone Number:</span>
+                      <span className="font-medium">+91 {phoneNumber}</span>
                     </div>
                   </div>
                   <p className="text-sm text-gray-400">

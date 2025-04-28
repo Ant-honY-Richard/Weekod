@@ -251,8 +251,8 @@ const BudgetCalculator = React.forwardRef<any, BudgetCalculatorProps>((props, re
     },
     resetCalculator: () => {
       // Reset all calculator values
-      setSelectedType('');
-      setComplexity('medium');
+      setSelectedType('landing');
+      setComplexity('simple');
       setSelectedFeatures([]);
       setSelectedSupport('free');
       setActiveTab('type');

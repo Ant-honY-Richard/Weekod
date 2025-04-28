@@ -19,7 +19,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Edit, Trash2, Plus, Calendar } from 'lucide-react';
+import { Edit, Trash2, Plus, Calendar, Phone } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 
@@ -39,7 +39,7 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
   const [formData, setFormData] = useState({
     customerName: '',
     customerEmail: '',
-    timeZone: '',
+    phoneNumber: '',
     scheduledTime: '',
     assignedTo: '',
     status: 'scheduled',
@@ -164,7 +164,7 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
       setFormData({
         customerName: '',
         customerEmail: '',
-        timeZone: '',
+        phoneNumber: '',
         scheduledTime: '',
         assignedTo: currentUser?._id || '',
         status: 'scheduled',
@@ -174,7 +174,7 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
       setFormData({
         customerName: '',
         customerEmail: '',
-        timeZone: '',
+        phoneNumber: '',
         scheduledTime: '',
         assignedTo: '',
         status: 'scheduled',
@@ -311,7 +311,7 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
         setFormData({
           customerName: call.customerName,
           customerEmail: call.customerEmail,
-          timeZone: call.timeZone,
+          phoneNumber: call.phoneNumber,
           scheduledTime: new Date(call.scheduledTime).toISOString().slice(0, 16),
           assignedTo: currentUser._id, // Always set to current employee's ID
           status: call.status,
@@ -323,7 +323,7 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
       setFormData({
         customerName: call.customerName,
         customerEmail: call.customerEmail,
-        timeZone: call.timeZone,
+        phoneNumber: call.phoneNumber,
         scheduledTime: new Date(call.scheduledTime).toISOString().slice(0, 16),
         assignedTo: call.assignedTo?._id || '',
         status: call.status,
@@ -396,7 +396,7 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
             <TableRow>
               <TableHead>Customer Name</TableHead>
               <TableHead>Customer Email</TableHead>
-              <TableHead>Time Zone</TableHead>
+              <TableHead>Phone Number</TableHead>
               <TableHead>Scheduled Time</TableHead>
               <TableHead>Assigned To</TableHead>
               <TableHead>Status</TableHead>
@@ -415,7 +415,15 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
                 <TableRow key={call._id}>
                   <TableCell>{call.customerName}</TableCell>
                   <TableCell>{call.customerEmail}</TableCell>
-                  <TableCell>{call.timeZone}</TableCell>
+                  <TableCell>
+                    <a 
+                      href={`tel:+91${call.phoneNumber}`} 
+                      className="text-blue-500 hover:text-blue-700 hover:underline flex items-center"
+                    >
+                      <Phone className="h-3 w-3 mr-1" />
+                      +91 {call.phoneNumber}
+                    </a>
+                  </TableCell>
                   <TableCell>{formatDateTime(call.scheduledTime)}</TableCell>
                   <TableCell>{call.assignedTo?.name || 'Unassigned'}</TableCell>
                   <TableCell>{getStatusBadge(call.status)}</TableCell>
@@ -544,15 +552,36 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label htmlFor="timeZone">Time Zone</label>
-                <Input
-                  id="timeZone"
-                  name="timeZone"
-                  value={formData.timeZone}
-                  onChange={handleInputChange}
-                  className="bg-gray-700 border-gray-600"
-                  placeholder="e.g., IST, EST, GMT+5:30"
-                />
+                <label htmlFor="phoneNumber">Phone Number (10 digits)</label>
+                <div className="flex items-center space-x-2">
+                  <Input
+                    id="phoneNumber"
+                    name="phoneNumber"
+                    value={formData.phoneNumber}
+                    onChange={(e) => {
+                      // Only allow digits and limit to 10 characters
+                      const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                      setFormData({
+                        ...formData,
+                        phoneNumber: value
+                      });
+                    }}
+                    className="bg-gray-700 border-gray-600"
+                    placeholder="9876543210"
+                    maxLength={10}
+                    pattern="[0-9]{10}"
+                  />
+                  {formData.phoneNumber.length === 10 && (
+                    <a 
+                      href={`tel:+91${formData.phoneNumber}`} 
+                      className="bg-green-600 hover:bg-green-700 text-white p-2 rounded-md"
+                      title="Call this number"
+                    >
+                      <Phone className="h-4 w-4" />
+                    </a>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500">Enter a 10-digit Indian mobile number</p>
               </div>
               <div className="space-y-2">
                 <label htmlFor="scheduledTime">Scheduled Time</label>
@@ -676,14 +705,34 @@ const CallScheduleTable = ({ isAdmin, employeeId }: CallScheduleTableProps) => {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label htmlFor="edit-timeZone">Time Zone</label>
-                <Input
-                  id="edit-timeZone"
-                  name="timeZone"
-                  value={formData.timeZone}
-                  onChange={handleInputChange}
-                  className="bg-gray-700 border-gray-600"
-                />
+                <label htmlFor="edit-phoneNumber">Phone Number (10 digits)</label>
+                <div className="flex items-center space-x-2">
+                  <Input
+                    id="edit-phoneNumber"
+                    name="phoneNumber"
+                    value={formData.phoneNumber}
+                    onChange={(e) => {
+                      // Only allow digits and limit to 10 characters
+                      const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                      setFormData({
+                        ...formData,
+                        phoneNumber: value
+                      });
+                    }}
+                    className="bg-gray-700 border-gray-600"
+                    placeholder="9876543210"
+                    maxLength={10}
+                    pattern="[0-9]{10}"
+                  />
+                  <a 
+                    href={`tel:+91${formData.phoneNumber}`} 
+                    className="bg-green-600 hover:bg-green-700 text-white p-2 rounded-md"
+                    title="Call this number"
+                  >
+                    <Phone className="h-4 w-4" />
+                  </a>
+                </div>
+                <p className="text-xs text-gray-500">Enter a 10-digit Indian mobile number</p>
               </div>
               <div className="space-y-2">
                 <label htmlFor="edit-scheduledTime">Scheduled Time</label>

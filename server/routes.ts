@@ -116,17 +116,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // API route for scheduling calls from the website
+  // Public API route for scheduling calls from the website
   app.post('/api/schedule-call', async (req: Request, res: Response) => {
     try {
-      const { customerName, customerEmail, timeZone, scheduledTime, message } = req.body;
+      // Log the entire request body for debugging
+      log(`Call schedule request body: ${JSON.stringify(req.body)}`, 'call-schedule');
+      
+      const { customerName, customerEmail, phoneNumber, scheduledTime, message } = req.body;
       
       log(`Call schedule request received from: ${customerName} (${customerEmail})`, 'call-schedule');
       
-      // Validate required fields
-      if (!customerName || !customerEmail || !timeZone || !scheduledTime) {
-        log('Call schedule validation failed: Missing required fields', 'call-schedule');
-        return res.status(400).json({ message: 'All fields are required' });
+      // Log all fields for debugging
+      log(`Validating fields: 
+        customerName: ${customerName ? 'present' : 'missing'}
+        customerEmail: ${customerEmail ? 'present' : 'missing'}
+        phoneNumber: ${phoneNumber ? 'present' : 'missing'} (${phoneNumber})
+        scheduledTime: ${scheduledTime ? 'present' : 'missing'} (${scheduledTime})
+      `, 'call-schedule');
+      
+      // Validate required fields with detailed logging
+      if (!customerName) {
+        log('Call schedule validation failed: Missing customerName', 'call-schedule');
+        return res.status(400).json({ message: 'Customer name is required' });
+      }
+      if (!customerEmail) {
+        log('Call schedule validation failed: Missing customerEmail', 'call-schedule');
+        return res.status(400).json({ message: 'Customer email is required' });
+      }
+      if (!phoneNumber) {
+        log('Call schedule validation failed: Missing phoneNumber', 'call-schedule');
+        return res.status(400).json({ message: 'Phone number is required' });
+      }
+      if (!scheduledTime) {
+        log('Call schedule validation failed: Missing scheduledTime', 'call-schedule');
+        return res.status(400).json({ message: 'Scheduled time is required' });
+      }
+      
+      // Accept any 10-digit number for now
+      if (phoneNumber && phoneNumber.length !== 10) {
+        log(`Call schedule validation failed: Phone number must be 10 digits: ${phoneNumber}`, 'call-schedule');
+        return res.status(400).json({ message: 'Phone number must be exactly 10 digits' });
       }
       
       try {
@@ -167,7 +196,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const callSchedule = new CallSchedule({
           customerName,
           customerEmail,
-          timeZone,
+          phoneNumber,
           scheduledTime: new Date(scheduledTime),
           assignedTo: assignedEmployee._id,
           status: CallStatus.SCHEDULED,

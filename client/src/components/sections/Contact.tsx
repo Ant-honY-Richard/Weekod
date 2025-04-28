@@ -53,36 +53,42 @@ const Contact = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
     
     console.log("Form submission started", formData);
 
+    // Get latest budget calculator data before submitting the form
+    const calculatorData = getBudgetData();
+    console.log("Budget calculator data:", calculatorData);
+    
+    // Validate budget calculator data - check all required fields
+    if (!calculatorData.selectedType || !calculatorData.complexity || calculatorData.total === 0) {
+      toast({
+        title: "Budget Calculator Required",
+        description: "Please complete all steps of the budget calculator before submitting.",
+        variant: "destructive",
+      });
+      
+      // Scroll to the budget calculator
+      const budgetCalculatorElement = document.getElementById('budget-calculator-section');
+      if (budgetCalculatorElement) {
+        budgetCalculatorElement.scrollIntoView({ behavior: 'smooth' });
+      }
+      return;
+    }
+    
+    // Validate required form fields
+    if (!formData.name || !formData.email || !formData.message) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in your name, email, and message.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setSubmitting(true);
+    
     try {
-      // Validate required form fields
-      if (!formData.name || !formData.email || !formData.message) {
-        toast({
-          title: "Missing Information",
-          description: "Please fill in your name, email, and message.",
-          variant: "destructive",
-        });
-        setSubmitting(false);
-        return;
-      }
-      
-      // Get latest budget calculator data only when submitting the form
-      const calculatorData = getBudgetData();
-      console.log("Budget calculator data:", calculatorData);
-      
-      // Validate budget calculator data
-      if (!calculatorData.selectedType) {
-        toast({
-          title: "Budget Information Required",
-          description: "Please complete the budget calculator before submitting.",
-          variant: "destructive",
-        });
-        setSubmitting(false);
-        return;
-      }
       
       // Create detailed project summary with all calculator data
       const projectDetails = {
@@ -126,21 +132,40 @@ const Contact = () => {
       });
 
       if (response.ok) {
-        toast({
-          title: "Message Sent!",
-          description: "We'll get back to you as soon as possible.",
-        });
-        setFormData({
-          name: '',
-          email: '',
-          company: '',
-          service: '',
-          message: ''
-        });
+        // Check if budget calculator is completed before showing success message
+        const calculatorData = getBudgetData();
         
-        // Reset budget calculator if possible
-        if (budgetCalculatorRef.current && typeof budgetCalculatorRef.current.resetCalculator === 'function') {
-          budgetCalculatorRef.current.resetCalculator();
+        if (!calculatorData.selectedType || !calculatorData.complexity || calculatorData.total === 0) {
+          toast({
+            title: "Budget Calculator Required",
+            description: "Please complete all steps of the budget calculator before submitting.",
+            variant: "destructive",
+          });
+          
+          // Scroll to the budget calculator
+          const budgetCalculatorElement = document.getElementById('budget-calculator-section');
+          if (budgetCalculatorElement) {
+            budgetCalculatorElement.scrollIntoView({ behavior: 'smooth' });
+          }
+        } else {
+          // Only show success message if budget calculator is completed
+          toast({
+            title: "Message Sent!",
+            description: `We'll get back to you as soon as possible. Your estimated budget is ₹${calculatorData.total.toLocaleString()} with a timeline of ${calculatorData.totalDays} days.`,
+          });
+          
+          setFormData({
+            name: '',
+            email: '',
+            company: '',
+            service: '',
+            message: ''
+          });
+          
+          // Reset budget calculator if possible
+          if (budgetCalculatorRef.current && typeof budgetCalculatorRef.current.resetCalculator === 'function') {
+            budgetCalculatorRef.current.resetCalculator();
+          }
         }
       } else {
         toast({
@@ -280,21 +305,26 @@ const Contact = () => {
                 </div>
               </div>
               
-              <motion.button 
-                type="submit" 
-                className="btn-hover-effect w-full bg-gradient-to-r from-accent-purple to-accent-magenta px-6 py-3 rounded-full text-white font-medium text-sm transition-all hover:shadow-lg hover:shadow-accent-purple/20 flex justify-center items-center"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                disabled={submitting}
-              >
-                {submitting ? (
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                ) : null}
-                {submitting ? 'Sending...' : 'Send Message'}
-              </motion.button>
+              <div className="space-y-2">
+                <motion.button 
+                  type="submit" 
+                  className="btn-hover-effect w-full bg-gradient-to-r from-accent-purple to-accent-magenta px-6 py-3 rounded-full text-white font-medium text-sm transition-all hover:shadow-lg hover:shadow-accent-purple/20 flex justify-center items-center"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  disabled={submitting}
+                >
+                  {submitting ? (
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  ) : null}
+                  {submitting ? 'Sending...' : 'Send Message & Submit Budget'}
+                </motion.button>
+                <p className="text-xs text-accent-magenta text-center">
+                  ⚠️ You must complete the budget calculator below before submitting
+                </p>
+              </div>
             </form>
           </motion.div>
           
@@ -383,6 +413,7 @@ const Contact = () => {
         
         {/* Budget Calculator Section */}
         <motion.div 
+          id="budget-calculator-section"
           className="mt-16 bg-dark-800 rounded-xl p-6 shadow-lg w-full max-w-screen-xl mx-auto"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -390,12 +421,19 @@ const Contact = () => {
           transition={{ duration: 0.5 }}
         >
           <div className="text-center mb-8">
-            <h3 className="text-2xl md:text-3xl font-display font-bold mb-4">
-              Budget <GradientText>Calculator</GradientText>
-            </h3>
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <h3 className="text-2xl md:text-3xl font-display font-bold">
+                Budget <GradientText>Calculator</GradientText>
+              </h3>
+              <span className="bg-accent-magenta text-white text-xs px-2 py-1 rounded-full uppercase font-bold animate-pulse">
+                Required
+              </span>
+            </div>
             <p className="text-silver text-sm md:text-base max-w-2xl mx-auto">
               Use our interactive budget calculator to estimate the cost and timeline for your project. 
-              This will help us understand your needs better when you submit the contact form.
+              <span className="text-accent-magenta font-semibold block mt-2">
+                ⚠️ You must complete all steps of the budget calculator before submitting the contact form.
+              </span>
             </p>
           </div>
           

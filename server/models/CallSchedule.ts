@@ -11,7 +11,7 @@ export enum CallStatus {
 export interface ICallSchedule extends Document {
   customerName: string;
   customerEmail: string;
-  timeZone: string;
+  phoneNumber: string;
   scheduledTime: Date;
   assignedTo: mongoose.Types.ObjectId;
   status: CallStatus;
@@ -27,7 +27,7 @@ const CallScheduleSchema = new Schema<ICallSchedule>({
     type: String,
     required: true
   },
-  timeZone: {
+  phoneNumber: {
     type: String,
     required: true
   },
