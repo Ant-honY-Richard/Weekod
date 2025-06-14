@@ -664,20 +664,3 @@
   color: #76aef1;
 }
 
-/* Neon Glow Border Effect */
-.neon-glow-border {
-  --neon-glow-color: theme('colors.neon-blue', #00A3FF); /* Default to neon-blue hex if Tailwind theme() not available here */
-  box-shadow: 0 0 3px 0px var(--neon-glow-color),
-              0 0 6px 0px var(--neon-glow-color),
-              0 0 10px 0px var(--neon-glow-color);
-  border: 1px solid var(--neon-glow-color);
-}
-
-/* Glassmorphism Panel Effect */
-.glassmorphism-panel {
-  background-color: rgba(30, 30, 47, 0.65); /* Slightly adjusted base for dark theme */
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px); /* For Safari */
-  border: 1px solid rgba(50, 50, 80, 0.45); /* Slightly adjusted border */
-  box-shadow: 0 4px 30px rgba(0,0,0,0.15); /* Slightly adjusted shadow */
-}
