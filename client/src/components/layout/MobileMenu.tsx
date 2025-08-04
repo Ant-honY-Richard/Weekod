@@ -8,7 +8,6 @@ interface MobileMenuProps {
 const navItems = [
   { name: 'Services', href: 'services' },
   { name: 'Process', href: 'process' },
-  { name: 'Portfolio', href: 'portfolio' },
   { name: 'Testimonials', href: 'testimonials' },
   { name: 'Contact', href: 'contact' },
 ];
@@ -101,12 +100,6 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
                 whileTap={{ scale: 0.95 }}
                 className="pt-4"
               >
-                <button
-                  onClick={() => handleClick('budget')}
-                  className="w-full bg-gradient-to-r from-accent-purple to-accent-magenta text-white px-6 py-3 rounded-full text-lg font-bold shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-300"
-                >
-                  Get Budget
-                </button>
               </motion.li>
             </motion.ul>
 

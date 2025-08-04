@@ -32,14 +32,6 @@ const FAQSection = () => {
       answer: "Our design process follows a user-centered approach: 1) Discovery - understanding your business, goals, and target audience; 2) Planning - creating sitemaps and wireframes; 3) Design - developing visual mockups and prototypes; 4) Development - building the actual website; 5) Testing - ensuring everything works perfectly; 6) Launch - going live with your new site; 7) Maintenance - providing ongoing support and updates."
     },
     {
-      question: "Do you help with content creation?",
-      answer: "Yes, we offer content creation services including copywriting, photography, video production, and graphic design. Our content team can help develop compelling content that engages your audience and effectively communicates your brand message. We can either create all content from scratch or work with existing materials you provide."
-    },
-    {
-      question: "Can you help with SEO and digital marketing?",
-      answer: "Absolutely! We provide comprehensive SEO services including keyword research, on-page optimization, technical SEO, and content strategy. Our digital marketing services include social media marketing, email campaigns, PPC advertising, and analytics. We focus on creating data-driven strategies that increase your online visibility and drive meaningful results."
-    },
-    {
       question: "What information do you need to start a project?",
       answer: "To get started, we typically need: 1) Your business information and brand guidelines; 2) Project goals and objectives; 3) Target audience details; 4) Content requirements; 5) Design preferences; 6) Technical requirements; 7) Timeline expectations; 8) Budget parameters. Don't worry if you don't have all of this information ready – we can guide you through the process during our initial consultation."
     }

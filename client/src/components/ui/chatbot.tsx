@@ -18,7 +18,7 @@ type Message = {
 };
 
 type ConversationContext = {
-  topic: 'general' | 'services' | 'portfolio' | 'timeline' | 'maintenance' | 'process' | 'technologies' | 'contact';
+  topic: 'general' | 'services' | 'timeline' | 'maintenance' | 'process' | 'technologies' | 'contact';
   lastQuery: string;
 };
 
@@ -30,9 +30,9 @@ const initialMessages: Message[] = [
     icon: <Sparkles className="h-4 w-4 text-yellow-400" />,
     quickReplies: [
       'What services do you provide?',
-      'Show me your portfolio',
       'How long does a project take?',
       'Tell me about your tech stack',
+      'How do you work?',
     ],
   },
 ];
@@ -143,27 +143,15 @@ export function ChatBot() {
         }
       }
 
-      // Portfolio-related queries
+      // Project-related queries (redirected to services)
       if (lowerQuery.includes('portfolio') || lowerQuery.includes('work') || lowerQuery.includes('projects')) {
-        setContext((prev) => ({ ...prev, topic: 'portfolio' }));
+        setContext((prev) => ({ ...prev, topic: 'services' }));
         return {
           id: Date.now().toString(),
-          text: "Our portfolio is packed with success stories! We've built:\n\n• Fashion Boutique: A sleek e-commerce site with React and Node.js\n• Financial Firm: A corporate site with Drizzle ORM\n• SaaS Dashboard: Real-time app with Vite and TypeScript\n\nWant to see more details or focus on a specific type?",
+          text: "I'd love to tell you about the amazing projects we can build for you! We specialize in creating custom digital solutions tailored to your needs.\n\nLet me share our core services and how we can help bring your vision to life:",
           sender: 'bot',
           icon: <Code className="h-4 w-4 text-blue-400" />,
-          quickReplies: ['E-commerce projects', 'Corporate websites', 'Web apps', 'View full portfolio'],
-        };
-      }
-
-      // Specific portfolio follow-ups
-      if (context.topic === 'portfolio' && (lowerQuery.includes('e-commerce') || lowerQuery.includes('corporate') || lowerQuery.includes('web app'))) {
-        const type = lowerQuery.includes('e-commerce') ? 'e-commerce' : lowerQuery.includes('corporate') ? 'corporate' : 'web app';
-        return {
-          id: Date.now().toString(),
-          text: `For ${type} projects, we focus on user experience and scalability. For example, our ${type === 'e-commerce' ? 'Fashion Boutique used React and Neon for fast checkout' : type === 'corporate' ? 'Financial Firm site leveraged Express.js for reliability' : 'SaaS app used Vite for blazing-fast builds'}. Shall I share a case study or show another category?`,
-          sender: 'bot',
-          icon: <Code className="h-4 w-4 text-blue-400" />,
-          quickReplies: ['Share case study', 'Show another category', 'Contact for details'],
+          quickReplies: ['What services do you provide?', 'Tell me about your process', 'Get a custom quote', 'Schedule consultation'],
         };
       }
 
@@ -283,8 +271,8 @@ export function ChatBot() {
         icon: <Sparkles className="h-4 w-4 text-purple-400" />,
         quickReplies: [
           'Services overview',
-          'Portfolio highlights',
           'Tech stack details',
+          'Development process',
           'Start a project',
         ],
       };

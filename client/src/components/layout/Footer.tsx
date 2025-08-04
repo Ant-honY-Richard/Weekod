@@ -48,7 +48,6 @@ const Footer = () => {
               <li><a href="#" className="text-silver hover:text-white transition-colors">Web Development</a></li>
               <li><a href="#" className="text-silver hover:text-white transition-colors">E-commerce Solutions</a></li>
               <li><a href="#" className="text-silver hover:text-white transition-colors">Search Engine Optimization</a></li>
-              <li><a href="#" className="text-silver hover:text-white transition-colors">Digital Marketing</a></li>
               <li><a href="#" className="text-silver hover:text-white transition-colors">Branding & Identity</a></li>
             </ul>
           </div>
@@ -58,9 +57,7 @@ const Footer = () => {
             <h4 className="text-xl font-display font-semibold mb-6">Quick Links</h4>
             <ul className="space-y-4">
               <li><a href="#" className="text-silver hover:text-white transition-colors">About Us</a></li>
-              <li><a href="#" className="text-silver hover:text-white transition-colors">Portfolio</a></li>
               <li><a href="#" className="text-silver hover:text-white transition-colors">Testimonials</a></li>
-              <li><a href="#" className="text-silver hover:text-white transition-colors">Blog</a></li>
               <li><a href="#" className="text-silver hover:text-white transition-colors">Privacy Policy</a></li>
               <li><a href="#" className="text-silver hover:text-white transition-colors">Terms of Service</a></li>
             </ul>

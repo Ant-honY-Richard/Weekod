@@ -415,7 +415,10 @@ const Contact = () => {
                   </div>
                   <div>
                     <h4 className="text-white text-sm font-medium">Call Us</h4>
-                    <a href="tel:+1234567890" className="text-accent-magenta hover:underline text-sm">+1 (234) 567-890</a>
+                    <div className="flex flex-col">
+                      <a href="tel:+917899242883" className="text-accent-magenta hover:underline text-sm">(+91) 78992 42883</a>
+                      <a href="tel:+918884460329" className="text-accent-magenta hover:underline text-sm">(+91) 88844 60329</a>
+                    </div>
                   </div>
                 </div>
                 
@@ -468,7 +471,7 @@ const Contact = () => {
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <h3 className="text-xl font-display font-semibold mb-4">Frequently Asked Questions</h3>
+              <h3 className="text-xl font-display font-semibold mb-4">Frequently Asked </h3>
               <FAQSection compact={true} />
             </motion.div>
           </div>

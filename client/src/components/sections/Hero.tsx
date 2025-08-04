@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import ParticlesBackground from '../ui/ParticlesBackground';
 import SectionContainer from '@/components/ui/SectionContainer';
+import ShinyText from '../ui/ShinyText';
 
 const Hero = () => {
   return (
@@ -78,14 +79,18 @@ const Hero = () => {
 
         </motion.h1>
         
-        <motion.p
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, delay: 0.3 }}
-          className="mt-8 text-lg sm:text-xl md:text-2xl text-silver animate-flow-text max-w-2xl mx-auto shining-text"
+          className="mt-8 text-lg sm:text-xl md:text-2xl animate-flow-text max-w-2xl mx-auto"
         >
-          We create stunning websites and applications that drive results and elevate your business to new heights.
-        </motion.p>
+          <ShinyText 
+            text="We create stunning websites and applications that drive results and elevate your business to new heights."
+            speed={4}
+            className="text-lg sm:text-xl md:text-2xl"
+          />
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -100,10 +105,10 @@ const Hero = () => {
             Get Started
           </a>
           <a
-            href="#portfolio"
+            href="#services"
             className="px-8 py-3 text-lg font-semibold rounded-lg border-2 border-fuchsia-500 text-fuchsia-500 hover:bg-fuchsia-500 hover:text-white transition-all duration-300 transform hover:scale-105 shining-text"
           >
-            View Portfolio
+            Our Services
           </a>
         </motion.div>
       </div>

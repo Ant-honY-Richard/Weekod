@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import React, { useState, FormEvent, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import GradientText from '@/components/ui/gradient-text';
-import BudgetCalculator from '@/components/ui/budget-calculator';
+
 import FAQSection from '@/components/ui/faq-section';
 
 // Import necessary components and hooks
@@ -17,20 +17,9 @@ const Contact = () => {
     message: ''
   });
 
-  // Budget calculator state
-  const [budgetData, setBudgetData] = useState({
-    total: 0,
-    totalDays: 0,
-    selectedType: '',
-    complexity: '',
-    selectedFeatures: [] as string[],
-    selectedSupport: '',
-    projectSummary: '',
-    estimatedDeliveryDate: ''
-  });
 
   const [submitting, setSubmitting] = useState(false);
-  const budgetCalculatorRef = useRef<any>(null);
+ 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -40,42 +29,12 @@ const Contact = () => {
     });
   };
   
-  // Function to get budget calculator data only when needed
-  const getBudgetData = () => {
-    if (budgetCalculatorRef.current && typeof budgetCalculatorRef.current.getCalculatorData === 'function') {
-      // Only get the data when explicitly called (on form submission)
-      const data = budgetCalculatorRef.current.getCalculatorData();
-      setBudgetData(data);
-      return data;
-    }
-    return budgetData;
-  };
-
+ 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     
     console.log("Form submission started", formData);
 
-    // Get latest budget calculator data before submitting the form
-    const calculatorData = getBudgetData();
-    console.log("Budget calculator data:", calculatorData);
-    
-    // Validate budget calculator data - check all required fields
-    if (!calculatorData.selectedType || !calculatorData.complexity || calculatorData.total === 0) {
-      toast({
-        title: "Budget Calculator Required",
-        description: "Please complete all steps of the budget calculator before submitting.",
-        variant: "destructive",
-      });
-      
-      // Scroll to the budget calculator
-      const budgetCalculatorElement = document.getElementById('budget-calculator-section');
-      if (budgetCalculatorElement) {
-        budgetCalculatorElement.scrollIntoView({ behavior: 'smooth' });
-      }
-      return;
-    }
-    
     // Validate required form fields
     if (!formData.name || !formData.email || !formData.message) {
       toast({
@@ -89,35 +48,8 @@ const Contact = () => {
     setSubmitting(true);
     
     try {
-      
-      // Create detailed project summary with all calculator data
-      const projectDetails = {
-        websiteType: calculatorData.selectedType,
-        complexity: calculatorData.complexity,
-        features: calculatorData.selectedFeatures,
-        supportPlan: calculatorData.selectedSupport,
-        total: calculatorData.total,
-        timeline: calculatorData.totalDays
-      };
-      
-      // Convert to JSON string for storage
-      const projectSummary = JSON.stringify(projectDetails);
-      
-      console.log("Created project summary:", projectSummary);
-      
-      console.log("Sending data to backend...");
-      // Create JSON object for the API with all calculator data as individual fields
       const jsonData = {
         ...formData,
-        budget: calculatorData.total.toString(),
-        estimatedTimeline: calculatorData.totalDays.toString(),
-        estimatedDeliveryDate: calculatorData.estimatedDeliveryDate,
-        projectSummary: projectSummary,
-        // Add individual calculator fields for easier access in backend
-        websiteType: calculatorData.selectedType,
-        complexity: calculatorData.complexity,
-        features: JSON.stringify(calculatorData.selectedFeatures),
-        supportPlan: calculatorData.selectedSupport
       };
       
       console.log("Sending JSON data:", jsonData);
@@ -130,61 +62,37 @@ const Contact = () => {
         },
         body: JSON.stringify(jsonData),
       });
-
-      if (response.ok) {
-        // Check if budget calculator is completed before showing success message
-        const calculatorData = getBudgetData();
-        
-        if (!calculatorData.selectedType || !calculatorData.complexity || calculatorData.total === 0) {
-          toast({
-            title: "Budget Calculator Required",
-            description: "Please complete all steps of the budget calculator before submitting.",
-            variant: "destructive",
-          });
-          
-          // Scroll to the budget calculator
-          const budgetCalculatorElement = document.getElementById('budget-calculator-section');
-          if (budgetCalculatorElement) {
-            budgetCalculatorElement.scrollIntoView({ behavior: 'smooth' });
-          }
-        } else {
-          // Only show success message if budget calculator is completed
-          toast({
-            title: "Message Sent!",
-            description: `We'll get back to you as soon as possible. Your estimated budget is ₹${calculatorData.total.toLocaleString()} with a timeline of ${calculatorData.totalDays} days.`,
-          });
-          
-          setFormData({
-            name: '',
-            email: '',
-            company: '',
-            service: '',
-            message: ''
-          });
-          
-          // Reset budget calculator if possible
-          if (budgetCalculatorRef.current && typeof budgetCalculatorRef.current.resetCalculator === 'function') {
-            budgetCalculatorRef.current.resetCalculator();
-          }
-        }
-      } else {
-        toast({
-          title: "Something went wrong",
-          description: "Please try again later.",
-          variant: "destructive",
-        });
+      
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
-    } catch (error) {
+      
       toast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
+        title: "Message Sent!",
+        description: "We'll get back to you as soon as possible.",
+      });
+      
+      // Reset form data on successful submission
+      setFormData({
+        name: '',
+        email: '',
+        company: '',
+        service: '',
+        message: ''
+      });
+      
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error Sending Message",
+        description: error instanceof Error ? error.message : "An unknown error occurred.",
         variant: "destructive",
       });
     } finally {
       setSubmitting(false);
     }
   };
-
+    
   return (
     <section id="contact" className="py-20 md:py-24 lg:py-28 gradient-bg w-full overflow-x-hidden">
       <div className="container mx-auto px-4 md:px-6 w-full">
@@ -267,7 +175,6 @@ const Contact = () => {
                     <option value="website">Website Design & Development</option>
                     <option value="ecommerce">E-commerce Development</option>
                     <option value="seo">Search Engine Optimization</option>
-                    <option value="marketing">Digital Marketing</option>
                     <option value="branding">Branding & Identity</option>
                     <option value="other">Other</option>
                   </select>
@@ -319,11 +226,9 @@ const Contact = () => {
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                   ) : null}
-                  {submitting ? 'Sending...' : 'Send Message & Submit Budget'}
+                  {submitting ? 'Sending...' : 'Send Message'}
                 </motion.button>
-                <p className="text-xs text-accent-magenta text-center">
-                  ⚠️ You must complete the budget calculator below before submitting
-                </p>
+               
               </div>
             </form>
           </motion.div>
@@ -364,7 +269,10 @@ const Contact = () => {
                   </div>
                   <div>
                     <h4 className="text-white text-sm font-medium">Call Us</h4>
-                    <a href="tel:+1234567890" className="text-accent-magenta hover:underline text-sm">+1 (234) 567-890</a>
+                    <div className="flex flex-col">
+                      <a href="tel:+917899242883" className="text-accent-magenta hover:underline text-sm">(+91) 78992 42883</a>
+                      <a href="tel:+918884460329" className="text-accent-magenta hover:underline text-sm">(+91) 88844 60329</a>
+                    </div>
                   </div>
                 </div>
                 
@@ -410,37 +318,7 @@ const Contact = () => {
             </motion.div>
           </div>
         </div>
-        
-        {/* Budget Calculator Section */}
-        <motion.div 
-          id="budget-calculator-section"
-          className="mt-16 bg-dark-800 rounded-xl p-6 shadow-lg w-full max-w-screen-xl mx-auto"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <h3 className="text-2xl md:text-3xl font-display font-bold">
-                Budget <GradientText>Calculator</GradientText>
-              </h3>
-              <span className="bg-accent-magenta text-white text-xs px-2 py-1 rounded-full uppercase font-bold animate-pulse">
-                Required
-              </span>
-            </div>
-            <p className="text-silver text-sm md:text-base max-w-2xl mx-auto">
-              Use our interactive budget calculator to estimate the cost and timeline for your project. 
-              <span className="text-accent-magenta font-semibold block mt-2">
-                ⚠️ You must complete all steps of the budget calculator before submitting the contact form.
-              </span>
-            </p>
-          </div>
-          
-          <div className="w-full bg-dark-800/50 rounded-lg p-4 shadow-inner">
-            <BudgetCalculator ref={budgetCalculatorRef} />
-          </div>
-        </motion.div>
+  
         
         {/* FAQ Section */}
         <motion.div 
@@ -449,16 +327,7 @@ const Contact = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <div className="text-center mb-8">
-            <h3 className="text-2xl md:text-3xl font-display font-bold mb-4">
-              Frequently Asked <GradientText>Questions</GradientText>
-            </h3>
-            <p className="text-silver text-sm md:text-base max-w-2xl mx-auto">
-              Find answers to common questions about our services, process, and pricing.
-            </p>
-          </div>
-          
+        >          
           <FAQSection />
         </motion.div>
       </div>

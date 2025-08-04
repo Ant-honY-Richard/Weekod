@@ -3,7 +3,6 @@ import Hero from "@/components/sections/Hero";
 import Services from "@/components/sections/Services";
 import Technologies from "@/components/sections/Technologies";
 import Process from "@/components/sections/Process";
-import Portfolio from "@/components/sections/Portfolio";
 import Testimonials from "@/components/sections/Testimonials";
 import CallToAction from "@/components/sections/CallToAction";
 import Contact from "@/components/sections/Contact";
@@ -37,7 +36,6 @@ const Home = () => {
       <Services />
       <Technologies />
       <Process />
-      <Portfolio />
       <Testimonials />
       <CallToAction />
       <Contact />
