@@ -12,6 +12,7 @@ import WeekodProGenerator from "@/pages/weekodpro-generator"; // Import the new 
 import { AnimatePresence } from "framer-motion";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import SplashCursor from "./components/ui/SplashCursor";
 import { useState, useEffect } from "react";
 import { InteractiveFeatures } from "@/components/ui/interactive-features";
 
@@ -106,6 +107,7 @@ function App() {
         {!isAuthRoute && <InteractiveFeatures />}
       </div>
       <Toaster />
+      <SplashCursor />
     </QueryClientProvider>
   );
 }

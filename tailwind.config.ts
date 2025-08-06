@@ -67,32 +67,26 @@ export default {
         },
       },
       keyframes: {
-        "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
-        },
-        "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
-        },
-        shine: {
-          '0%': { 'background-position': '100%' },
-          '100%': { 'background-position': '-100%' },
-        },
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-        shine: 'shine 5s linear infinite',
-      },
+  shine: {
+    '0%': { backgroundPosition: '100%' },
+    '100%': { backgroundPosition: '-100%' },
+  },
+  // keep accordion animations as-is
+  "accordion-down": {
+    from: { height: "0" },
+    to: { height: "var(--radix-accordion-content-height)" },
+  },
+  "accordion-up": {
+    from: { height: "var(--radix-accordion-content-height)" },
+    to: { height: "0" },
+  },
+},
+animation: {
+  shine: 'shine 5s linear infinite',
+  'shine-fast': 'shine 3s linear infinite',
+  'shine-slow': 'shine 8s linear infinite',
+},
+
     },
   },
   plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],

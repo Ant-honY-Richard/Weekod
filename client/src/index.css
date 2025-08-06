@@ -207,6 +207,21 @@
   }
 }
 
+@keyframes aurora {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-aurora {
+  background-size: 200% 200%;
+  animation: aurora 2s ease infinite;
+}
+
+
 /* Keyframe Animations */
 @keyframes pulse-glow {
   0% {

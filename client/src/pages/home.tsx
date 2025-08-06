@@ -40,6 +40,7 @@ const Home = () => {
       <CallToAction />
       <Contact />
     </motion.div>
+    
   );
 };
 
