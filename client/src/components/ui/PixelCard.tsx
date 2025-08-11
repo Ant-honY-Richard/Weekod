@@ -187,8 +187,7 @@ export default function PixelCard({
   );
   const timePreviousRef = useRef(performance.now());
   const reducedMotion = useRef(
-    typeof window !== 'undefined' ? 
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches : false
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
   ).current;
 
   const variantCfg: VariantConfig = VARIANTS[variant] || VARIANTS.default;
@@ -203,9 +202,7 @@ export default function PixelCard({
     const width = Math.floor(rect.width);
     const height = Math.floor(rect.height);
     const ctx = canvasRef.current.getContext("2d");
-    
-    if (!ctx) return;
-    
+
     canvasRef.current.width = width;
     canvasRef.current.height = height;
     canvasRef.current.style.width = `${width}px`;
@@ -213,7 +210,7 @@ export default function PixelCard({
 
     const colorsArray = finalColors.split(",");
     const pxs = [];
-    
+
     for (let x = 0; x < width; x += parseInt(finalGap.toString(), 10)) {
       for (let y = 0; y < height; y += parseInt(finalGap.toString(), 10)) {
         const color =
@@ -222,6 +219,8 @@ export default function PixelCard({
         const dy = y - height / 2;
         const distance = Math.sqrt(dx * dx + dy * dy);
         const delay = reducedMotion ? 0 : distance;
+
+        if (!ctx) return;
 
         pxs.push(
           new Pixel(
@@ -236,24 +235,27 @@ export default function PixelCard({
         );
       }
     }
+
     pixelsRef.current = pxs;
   };
 
   const doAnimate = (fnName: keyof Pixel) => {
     animationRef.current = requestAnimationFrame(() => doAnimate(fnName));
+
     const timeNow = performance.now();
     const timePassed = timeNow - timePreviousRef.current;
     const timeInterval = 1000 / 60;
-    
+
     if (timePassed < timeInterval) return;
+
     timePreviousRef.current = timeNow - (timePassed % timeInterval);
 
     const ctx = canvasRef.current?.getContext("2d");
     if (!ctx || !canvasRef.current) return;
 
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+
     let allIdle = true;
-    
     for (let i = 0; i < pixelsRef.current.length; i++) {
       const pixel = pixelsRef.current[i];
       // @ts-ignore
@@ -262,8 +264,8 @@ export default function PixelCard({
         allIdle = false;
       }
     }
-    
-    if (allIdle && animationRef.current) {
+
+    if (allIdle) {
       cancelAnimationFrame(animationRef.current);
     }
   };
@@ -290,11 +292,11 @@ export default function PixelCard({
 
   useEffect(() => {
     initPixels();
-    
+
     const observer = new ResizeObserver(() => {
       initPixels();
     });
-    
+
     if (containerRef.current) {
       observer.observe(containerRef.current);
     }

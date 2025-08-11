@@ -30,7 +30,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 3 }}
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-transparent bg-clip-text animate-aurora bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400"
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-transparent bg-clip-text animate-aurora bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400"
         >
           Transforming Ideas Into
           <br />

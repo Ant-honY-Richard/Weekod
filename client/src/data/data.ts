@@ -1,4 +1,4 @@
-import { WebDevelopmentIcon, EcommerceIcon, MobileDevelopmentIcon } from '@/components/icons';
+import { WebDevelopmentIcon, EcommerceIcon, AcademicProjectsIcon } from '@/components/icons';
 
 export const services = [
   {
@@ -27,14 +27,16 @@ export const services = [
   },
   {
     id: "3",
-    title: "Mobile Development",
-    description: "Native and cross-platform mobile applications.",
-    icon: MobileDevelopmentIcon,
+    title: "Students Academic Projects",
+    description: "Comprehensive academic project solutions for students across all disciplines.",
+    icon: AcademicProjectsIcon,
     features: [
-      "iOS & Android Apps",
-      "Cross-platform Development",
-      "Push Notifications",
-      "Offline Support",
+      "Research & Documentation",
+      "Project Implementation",
+      "Code Review & Optimization",
+      "Presentation & Defense Support",
+      "Plagiarism-Free Content",
+      "24/7 Academic Support",
     ],
   },
 ];

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { technologies } from '@/lib/data';
-import PixelCard from '@/components/ui/PixelCard';
+import CardSwap, { Card } from '@/components/ui/CardSwap';
 import { useState } from 'react';
 
 // Tech icon component with fallback
@@ -42,7 +42,7 @@ const TechIcon = ({ tech }: { tech: any }) => {
 
   if (!hasLogo || imgError) {
     return (
-      <span className="text-2xl" role="img" aria-label={tech.name}>
+      <span className="text-3xl" role="img" aria-label={tech.name}>
         {getFallbackIcon(tech.name)}
       </span>
     );
@@ -52,7 +52,7 @@ const TechIcon = ({ tech }: { tech: any }) => {
     <img
       src={tech.icon}
       alt={tech.name}
-      className="w-8 h-8 object-contain"
+      className="w-12 h-12 object-contain"
       style={{ filter: 'brightness(0) invert(1)' }}
       onError={() => setImgError(true)}
     />
@@ -60,25 +60,11 @@ const TechIcon = ({ tech }: { tech: any }) => {
 };
 
 const Technologies = () => {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        delayChildren: 0.3,
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  // Define color variants for different technologies
-  const getPixelVariant = (index: number) => {
-    const variants = ['default', 'blue', 'yellow', 'pink'] as const;
-    return variants[index % variants.length];
-  };
+  // Get featured technologies for the card swap
+  const featuredTechs = technologies.slice(0, 6);
 
   return (
-    <section id="technologies" className="py-20 bg-dark-800">
+    <section id="technologies" className="py-20 bg-dark-800 relative overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -96,37 +82,74 @@ const Technologies = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 justify-items-center">
-          {technologies.map((tech, index) => (
+    {/* Left side content */}
+        <div className="flex flex-col lg:flex-row items-center justify-between">
+          <div className="lg:w-1/2 mb-12 lg:mb-0">
             <motion.div
-              key={tech.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              transition={{ duration: 0.8 }}
+              className="space-y-6"
             >
-              <PixelCard 
-                variant={getPixelVariant(index)}
-                className="w-[160px] h-[180px] sm:w-[180px] sm:h-[200px]"
-              >
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center z-10">
-                  <div className="mb-3 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-sm">
-                    <TechIcon tech={tech} />
-                  </div>
-                  <h3 className="text-sm font-bold text-white mb-2 leading-tight">
-                    {tech.name}
-                  </h3>
-                  <p className="text-xs text-gray-300 leading-relaxed overflow-hidden" style={{ 
-                    display: '-webkit-box', 
-                    WebkitLineClamp: 3, 
-                    WebkitBoxOrient: 'vertical' 
-                  }}>
-                    {tech.description}
-                  </p>
-                </div>
-              </PixelCard>
+              <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+                Cutting-Edge Technologies
+              </h3>
+              <p className="text-lg text-gray-300 leading-relaxed">
+                Our team leverages the latest and most powerful technologies to deliver 
+                exceptional digital solutions. From modern frontend frameworks to robust 
+                backend systems, we ensure your project is built with the best tools available.
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-8">
+                    {technologies.slice(6).map((tech, index) => (
+                  <motion.div
+                    key={tech.name}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className="flex items-center space-x-3 p-3 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 transition-colors"
+                  >
+                    <div className="w-8 h-8 flex items-center justify-center">
+                      <TechIcon tech={tech} />
+                    </div>
+                    <span className="text-sm font-medium text-white truncate">
+                      {tech.name}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
             </motion.div>
-          ))}
+          </div>
+
+          {/* Right side - CardSwap */}
+          <div className="lg:w-1/2 relative" style={{ height: '600px' }}>
+            <CardSwap
+              width={400}
+              height={300}
+              cardDistance={60}
+              verticalDistance={70}
+              delay={4000}
+              pauseOnHover={true}
+              easing="elastic"
+            >
+              {featuredTechs.map((tech, index) => (
+                <Card key={tech.name} className="bg-gradient-to-br from-gray-900 to-gray-800 border-gray-600 shadow-2xl">
+                  <div className="flex flex-col items-center justify-center h-full p-6 text-center">
+                    <div className="mb-4 w-16 h-16 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-sm">
+                      <TechIcon tech={tech} />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-3">
+                      {tech.name}
+                    </h3>
+                    <p className="text-sm text-gray-300 leading-relaxed">
+                      {tech.description}
+                    </p>
+                  </div>
+                </Card>
+              ))}
+            </CardSwap>
+          </div>
         </div>
       </div>
     </section>
