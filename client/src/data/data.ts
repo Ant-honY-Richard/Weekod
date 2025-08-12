@@ -70,11 +70,10 @@ export const testimonials = [
 
 export const contactInfo = {
   email: "contact@weekodpro.com",
-  phone: "+91 88844 60329",
   address: "123 Tech Street, Silicon Valley, CA 94025",
   social: {
-    twitter: "https://twitter.com/weekodpro",
-    linkedin: "https://linkedin.com/company/weekodpro",
-    github: "https://github.com/weekodpro",
+    facebook: "https://www.facebook.com/share/1CMTBy365s/",
+    instagram: "https://www.instagram.com/weekod_in?igsh=MTBqd2JxY3pta3Zydw==",
+    linkedin: "https://www.linkedin.com/company/weekod/",
   },
 }; 
