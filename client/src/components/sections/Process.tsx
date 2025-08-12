@@ -151,15 +151,29 @@ const Process = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-dark-800 rounded-xl p-6 sm:p-8 hover:bg-dark-700 transition-all duration-300"
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="group relative bg-dark-800 rounded-xl p-6 sm:p-8 hover:bg-dark-700 transition-all duration-300 overflow-hidden cursor-pointer"
             >
-              <div className="w-16 h-16 bg-gradient-to-r from-accent-purple to-accent-magenta rounded-lg flex items-center justify-center mb-6">
-                {step.icon}
+              {/* Spotlight Effect */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                <div className="absolute inset-0 bg-gradient-radial from-white/10 via-white/5 to-transparent rounded-xl transform scale-0 group-hover:scale-150 transition-transform duration-700 ease-out"></div>
               </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-white mb-4">
-                {step.title}
-              </h3>
-              <p className="text-silver">{step.description}</p>
+              
+              {/* Animated Border Glow */}
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-accent-purple/0 via-accent-magenta/0 to-accent-purple/0 group-hover:from-accent-purple/20 group-hover:via-accent-magenta/20 group-hover:to-accent-purple/20 transition-all duration-500 opacity-0 group-hover:opacity-100 blur-sm"></div>
+              
+              {/* Content */}
+              <div className="relative z-10">
+                <div className="w-16 h-16 bg-gradient-to-r from-accent-purple to-accent-magenta rounded-lg flex items-center justify-center mb-6 group-hover:shadow-lg group-hover:shadow-accent-purple/25 transition-all duration-300">
+                  <div className="text-white group-hover:scale-110 transition-transform duration-300">
+                    {step.icon}
+                  </div>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 group-hover:text-accent-purple transition-colors duration-300">
+                  {step.title}
+                </h3>
+                <p className="text-silver group-hover:text-gray-300 transition-colors duration-300">{step.description}</p>
+              </div>
             </motion.div>
           ))}
         </div>

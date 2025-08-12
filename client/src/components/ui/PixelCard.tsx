@@ -138,8 +138,8 @@ const VARIANTS = {
   },
   yellow: {
     activeColor: "#fef08a",
-    gap: 3,
-    speed: 20,
+    gap: 8,
+    speed: 15,
     colors: "#fef08a,#fde047,#eab308",
     noFocus: false,
   },

@@ -50,10 +50,10 @@ const FAQSection = () => {
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.5 }}
       >
-        <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold mb-4">
           Frequently <GradientText>Asked</GradientText> Questions
         </h2>
-        <p className="text-silver text-base md:text-lg">
+        <p className="text-silver text-base md:text-lg lg:text-xl">
           Find answers to common questions about our services and process
         </p>
       </motion.div>
@@ -74,7 +74,7 @@ const FAQSection = () => {
               } transition-colors duration-200`}
               onClick={() => toggleQuestion(index)}
             >
-              <span className="font-medium text-lg">{item.question}</span>
+              <span className="font-medium text-lg lg:text-xl">{item.question}</span>
               <span className={`transform transition-transform duration-200 ${
                 openIndex === index ? 'rotate-180' : ''
               }`}>
@@ -104,7 +104,7 @@ const FAQSection = () => {
                   transition={{ duration: 0.3 }}
                   className="overflow-hidden"
                 >
-                  <div className="px-6 py-4 border-t border-dark-600 text-silver">
+                  <div className="px-6 py-4 border-t border-dark-600 text-silver text-base lg:text-lg leading-relaxed">
                     {item.answer}
                   </div>
                 </motion.div>

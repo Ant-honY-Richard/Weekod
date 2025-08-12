@@ -153,32 +153,32 @@ export default function Technology() {
                 {category.category}
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
                 {category.items.map((tech, index) => (
                   <motion.div
                     key={tech.name}
                     whileHover={{ scale: 1.05, y: -5 }}
                     whileTap={{ scale: 0.95 }}
-                    className="group relative bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:border-accent-purple/50 transition-all duration-300"
+                    className="group relative bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-gray-700/50 hover:border-accent-purple/50 transition-all duration-300"
                   >
                     {/* Glow Effect */}
                     <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-accent-purple/0 to-accent-magenta/0 group-hover:from-accent-purple/10 group-hover:to-accent-magenta/10 transition-all duration-300" />
 
                     <div className="relative z-10">
-                      <div className="h-16 mb-4 flex items-center justify-center">
+                      <div className="h-12 sm:h-16 mb-3 sm:mb-4 flex items-center justify-center">
                         <img
                           src={tech.logo}
                           alt={`${tech.name} logo`}
-                          className="h-12 w-12 object-contain filter brightness-0 invert opacity-80 group-hover:opacity-100 transition-all duration-300"
+                          className="h-10 w-10 sm:h-12 sm:w-12 object-contain filter brightness-0 invert opacity-80 group-hover:opacity-100 transition-all duration-300"
                           onError={(e) =>
                             (e.currentTarget.src = '/tech-logos/placeholder.svg')
                           }
                         />
                       </div>
-                      <h4 className="text-xl font-semibold text-white mb-2">
+                      <h4 className="text-lg sm:text-xl font-semibold text-white mb-2">
                         {tech.name}
                       </h4>
-                      <p className="text-gray-400 text-sm group-hover:text-gray-300 transition-colors duration-300">
+                      <p className="text-gray-400 text-xs sm:text-sm group-hover:text-gray-300 transition-colors duration-300">
                         {tech.description}
                       </p>
                     </div>

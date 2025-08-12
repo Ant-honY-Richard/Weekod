@@ -6,7 +6,7 @@ import PixelCard from "@/components/ui/PixelCard";
 const Services = () => {
   // Define different variants for each service
   const getPixelVariant = (index: number) => {
-    const variants = ['default', 'blue', 'pink'] as const;
+    const variants = ['blue', 'pink', 'yellow'] as const;
     return variants[index % variants.length];
   };
 
@@ -53,16 +53,16 @@ const Services = () => {
                 </h3>
                 
                 {/* Description */}
-                <p className="text-gray-300 mb-6 leading-relaxed text-sm">
+                <p className="text-gray-300 mb-6 leading-relaxed text-base sm:text-lg">
                   {service.description}
                 </p>
                 
                 {/* Features */}
-                <ul className="space-y-2 w-full">
+                <ul className="space-y-3 w-full">
                   {service.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center text-gray-300 text-sm">
+                    <li key={featureIndex} className="flex items-center text-gray-300 text-base sm:text-lg">
                       <svg
-                        className="w-4 h-4 text-green-400 mr-3 flex-shrink-0"
+                        className="w-5 h-5 text-green-400 mr-3 flex-shrink-0"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"

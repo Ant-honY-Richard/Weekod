@@ -115,7 +115,7 @@ const Navbar = () => {
                   <motion.button
                     key={item.name}
                     onClick={() => handleNavClick(item.href)}
-                    className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                    className={`relative px-4 py-2 rounded-full text-sm lg:text-base xl:text-lg font-medium transition-all duration-300 ${
                       activeSection === item.href
                         ? 'text-white'
                         : 'text-silver hover:text-white'
@@ -145,7 +145,7 @@ const Navbar = () => {
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-accent-purple to-accent-magenta rounded-full opacity-80 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="absolute -inset-1 bg-gradient-to-r from-accent-purple to-accent-magenta rounded-full opacity-0 group-hover:opacity-30 blur-md transition-opacity duration-300"></div>
-                <span className="relative z-10 block px-6 py-2.5 text-white font-medium">
+                <span className="relative z-10 block px-6 py-2.5 text-sm lg:text-base xl:text-lg text-white font-medium">
                   Get in Touch
                 </span>
               </motion.button>
