@@ -30,9 +30,10 @@ const Hero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 3 }}
-          className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-black leading-tight tracking-wider"
+          className="hero-title font-black leading-tight tracking-wider"
           style={{
             fontFamily: "'Orbitron', 'Exo 2', 'Rajdhani', 'Space Mono', monospace",
+            fontSize: "clamp(1.5rem, 4vw, 5rem)",
             background: "linear-gradient(45deg, #C0C0C0 0%, #E8E8E8 15%, #A8A8A8 30%, #D3D3D3 45%, #B8B8B8 60%, #E0E0E0 75%, #BEBEBE 90%, #F5F5F5 100%)",
             backgroundClip: "text",
             WebkitBackgroundClip: "text",
@@ -40,6 +41,9 @@ const Hero = () => {
             textShadow: "0 0 20px rgba(192, 192, 192, 0.4), 0 0 40px rgba(192, 192, 192, 0.2), 0 0 60px rgba(192, 192, 192, 0.1)",
             filter: "drop-shadow(1px 1px 3px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 8px rgba(255, 255, 255, 0.2))",
             letterSpacing: "0.05em",
+            textSizeAdjust: "100%", // Prevents browser font scaling
+            WebkitTextSizeAdjust: "100%", // Chrome-specific
+            MozTextSizeAdjust: "100%", // Firefox-specific
           }}
         >
           <motion.span

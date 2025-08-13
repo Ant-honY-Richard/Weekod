@@ -6,6 +6,14 @@
   .bg-gradient-radial {
     background-image: radial-gradient(var(--tw-gradient-stops));
   }
+  
+  /* Hero title consistent sizing */
+  .hero-title {
+    font-size: clamp(1.5rem, 4vw, 5rem) !important;
+    line-height: 1.1 !important;
+    -webkit-text-size-adjust: none !important;
+    text-size-adjust: none !important;
+  }
 }
 
 @layer base {
@@ -41,10 +49,23 @@
     --radius: 0.75rem;
   }
   
+  /* Browser-specific font rendering normalization */
+  * {
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
   html {
     scroll-behavior: smooth;
     scroll-padding-top: 6rem;
     height: 100%;
+    /* Force consistent font scaling across browsers */
+    font-size: 16px;
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
     overflow-x: hidden; /* Prevent horizontal scrolling */
   }
   
