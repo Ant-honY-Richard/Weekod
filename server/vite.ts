@@ -4,7 +4,6 @@ import path from "path";
 import { fileURLToPath } from "url"; // ✅ Import for __dirname support
 import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
-import { nanoid } from "nanoid";
 
 // ✅ Setup __dirname manually
 const __filename = fileURLToPath(import.meta.url);
@@ -57,9 +56,11 @@ export async function setupVite(app: Express, server: Server) {
 
       // Always reload the index.html file from disk in case it changes
       let template = await fs.promises.readFile(clientTemplate, "utf-8");
+      // Generate cache-busting parameter using timestamp + random
+      const cacheId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       template = template.replace(
         `src="/src/main.tsx"`,
-        `src="/src/main.tsx?v=${nanoid()}"`,
+        `src="/src/main.tsx?v=${cacheId}`,
       );
       const page = await vite.transformIndexHtml(url, template);
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
