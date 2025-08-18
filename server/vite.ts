@@ -60,7 +60,7 @@ export async function setupVite(app: Express, server: Server) {
       const cacheId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       template = template.replace(
         `src="/src/main.tsx"`,
-        `src="/src/main.tsx?v=${cacheId}`,
+        `src="/src/main.tsx?v=${cacheId}"`,
       );
       const page = await vite.transformIndexHtml(url, template);
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
