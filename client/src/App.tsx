@@ -8,7 +8,6 @@ import Login from "@/pages/login";
 import AdminDashboard from "@/pages/admin/dashboard";
 import EmployeeDashboard from "@/pages/employee/dashboard";
 import WeekodWorkspace from "@/pages/weekod-workspace";
-import WeekodProGenerator from "@/pages/weekodpro-generator"; // Import the new page
 import { AnimatePresence } from "framer-motion";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -78,7 +77,6 @@ function Router() {
         <ProtectedRoute component={EmployeeDashboard} />
       </Route>
       <Route path="/weekod-workspace" component={WeekodWorkspace} />
-      <Route path="/generator" component={WeekodProGenerator} /> {/* Add the new route */}
       <Route path="/" component={Home} />
       <Route component={NotFound} />
     </Switch>
